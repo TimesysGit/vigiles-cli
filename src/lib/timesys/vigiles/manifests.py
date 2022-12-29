@@ -8,7 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 def get_manifests():
-    """Get all manifests that are accessible by the current user
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Get all manifests that are accessible by the current user
 
     Product or folder tokens can be configured to limit results, but only one
     may be provided. If configured on the llapi object, folder token takes
@@ -47,12 +49,15 @@ def get_manifests():
 
 
 def get_manifest_info(manifest_token, sbom_format=None, file_format=None, sbom_version=None):
-    """Get manifest data along with metadata
+    """**Access to this route requires a Vigiles prime subscription.**
+    
+    Get manifest data along with metadata
 
     Parameters
     ----------
     sbom_format : str, optional
         If specified, the server will convert the manifest data to this format.
+
         Acceptable formats are:
             "spdx"
                 Convert the manifest to SPDX format before returning it
@@ -93,7 +98,9 @@ def get_manifest_info(manifest_token, sbom_format=None, file_format=None, sbom_v
 
 
 def get_manifest_file(manifest_token, sbom_format=None, file_format=None, sbom_version=None):
-    """Get manifest data as a file
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Get manifest data as a file
 
     Response does not include other metadata such as product/folder tokens.
 
@@ -101,6 +108,7 @@ def get_manifest_file(manifest_token, sbom_format=None, file_format=None, sbom_v
     ----------
     sbom_format : str, optional
         If specified, the server will convert the manifest data to the specified format.
+        
         Acceptable formats are:
             "spdx"
                 Convert the manifest to SPDX format before returning it
@@ -232,7 +240,9 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
 
 
 def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, extra_fields=None):
-    """Generate a new report for the given manifest_token
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Generate a new report for the given manifest_token
 
     Parameters
     ---------
@@ -291,7 +301,9 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
 
 
 def delete_manifest(manifest_token, confirmed=False):
-    """Delete a manifest with the given token
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Delete a manifest with the given token
 
     This action can not be undone. It requires passing True for the
     'confirmed' keyword parameter to prevent accidental use.
@@ -323,7 +335,9 @@ def delete_manifest(manifest_token, confirmed=False):
 
 
 def get_report_tokens(manifest_token):
-    """Get a list of report_tokens available for the given manifest_token
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Get a list of report_tokens available for the given manifest_token
 
     Parameters
     ----------
@@ -334,6 +348,7 @@ def get_report_tokens(manifest_token):
     -------
     dict
         A dictionary with meta info about the requested manifest and a list of report info
+        
         dictionaries, each of which contain the keys:
             "created_date", "report_token", "manifest_token", "manifest_version"
     """
@@ -346,7 +361,9 @@ def get_report_tokens(manifest_token):
 
 
 def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
-    """Download the latest report for a manifest with the given token.
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Download the latest report for a manifest with the given token.
 
     Parameters
     ----------

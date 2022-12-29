@@ -5,7 +5,9 @@ import timesys
 
 
 def get_folders():
-    """Get all folders that are owned by the current user.
+    """**Access to this route requires a Vigiles prime subscription..**
+
+    Get all folders that are owned by the current user.
 
     If a product token is configured on the llapi object, only folders belonging
     to that product will be returned.
