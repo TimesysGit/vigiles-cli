@@ -1,15 +1,15 @@
 # Vigiles CLI
 
 This project contains a Python package and a command-line tool for
-interacting with [Vigiles](https://www.timesys.com/solutions/vigiles-vulnerability-management/) APIs.
+interacting with [Vigiles](https://vigiles.lynx.com/docs/) APIs.
 
-Documentation generated from this repository is hosted at https://linuxlink.timesys.com/docs/vigiles-cli
+Documentation generated from this repository is hosted at https://vigiles.lynx.com/docs/vigiles_cli/
 
-The server-side API endpoint documentation for Vigiles is here: https://linuxlink.timesys.com/docs/vigiles-api-manual
+The server-side API endpoint documentation for Vigiles is here: https://vigiles.lynx.com/docs/vigiles_cli/timesys.vigiles.html
 
 ### Requirements
 
- - Python >= 3.6
+ - Python >= 3.7
 
 ### Install
 
@@ -28,19 +28,18 @@ pip3 install .[docs]
 ### Setup
 
 Usage of the APIs requires a [Key
-file](https://linuxlink.timesys.com/docs/wiki/engineering/LinuxLink_Key_File)
+file](https://vigiles.lynx.com/docs/vigiles_api_key_file.html)
 for authentication. The key file contains the user's email address and
 API key.
 
-For configuring the Vigiles subpackage to use specific Product or Folder
+For configuring the Vigiles subpackage to use specific Group or Folder
 locations, refer to the [Dashboard
-Config](https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config)
-documentation. Dashboard Config files are downloaded from Product pages
-on the [Vigiles Dashboard](https://linuxlink.timesys.com/vigiles/) and
-passed to the core LLAPI object's `configure` method. Product and
+Config](https://vigiles.lynx.com/docs/index.html#dashboard-config)
+documentation. Dashboard Config files are downloaded from Group pages
+on the [Vigiles Dashboard](https://vigiles.lynx.com/) and
+passed to the core LLAPI object's `configure` method. Group and
 Folder tokens may also be set directly on that object without a file.
 
-Most features of the API require a [Vigiles Prime subscription](https://www.timesys.com/solutions/vigiles-vulnerability-management/options/).
 
 ### Getting Started
 
@@ -90,6 +89,54 @@ Verify authentication and server availability:
 If the heartbeat is ok, you are ready to use any of the toolkit's
 modules!
 
+
+#### Group settings
+
+To view current group settings use `info` command
+
+```
+$ vigiles -k path/to/linuxlink_key -d path/to/dashboard-config group settings info
+```
+
+Vigiles allows users to customize how vulnerabilities are matched in CVE scans by selecting specific identifiers.
+You can configure one or more of the following identifiers using group settings `update` command:
+- CPE
+- PURL
+- CVE Product
+- Package Name
+
+```
+$ vigiles -k path/to/linuxlink_key -d path/to/dashboard-config group settings update -i PURL CPE 'CVE Product'
+```
+**Note:** If selected identifiers are not found in the SBOM, the `Package Name` will be used as the default identifier.
+
+You can also set vuln-strict-match to "on" or "off" to enable or disable strict vendor matching.
+When enabled, this option matches vulnerabilities against the product vendor together with the vulnerability identifier.
+
+```
+$ vigiles -k path/to/linuxlink_key -d path/to/dashboard-config group settings update -s on
+```
+
+
+## Generate Documentation
+
+If you want to generate documents:
+
+Install dependencies (if not done before)
+
+```
+pip3 install .[docs]
+```
+
+Generate HTML docs
+
+```
+cd docs
+make html
+```
+
+All docs can be found in: {vigiles-cli directoy}/docs/build/html
+
 ## Additional Notes
 
 ### Logging
@@ -135,5 +182,5 @@ to result in the same token for the header.
 >>> timesys.llapi.configure(key_file_path='/path/to/linuxlink_key', dry_run=True)
 Dry Run mode is enabled. No requests will be made.
 >>> timesys.utilities.heartbeat()
-{'headers': {'X-Auth-Signature': b'<token here>'}, 'method': 'POST', 'url': 'https://linuxlink.timesys.com/api/v1/heartbeat', 'data': {'email': 'user@example.com'}, 'hmac_msg': b'POST/api/v1/heartbeatemail=user@example.com'}
+{'headers': {'X-Auth-Signature': b'<token here>'}, 'method': 'POST', 'url': 'https://vigiles.lynx.com/api/v1/heartbeat', 'data': {'email': 'user@example.com'}, 'hmac_msg': b'POST/api/v1/heartbeatemail=user@example.com'}
 ```

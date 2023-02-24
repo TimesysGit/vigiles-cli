@@ -1,13 +1,11 @@
-# SPDX-FileCopyrightText: 2022 Timesys Corporation
+# SPDX-FileCopyrightText: 2023 Timesys Corporation
 # SPDX-License-Identifier: MIT
 
 import timesys
 
 
-def download_report(report_token, format=None, filter_results=False):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get a CVE report as a file from the given report token
+def download_report(report_token, format=None, filter_results=False, cyclonedx_format="json", cyclonedx_version="1.6"):
+    """Get a CVE report as a file from the given report token
 
     Parameters
     ----------
@@ -23,13 +21,21 @@ def download_report(report_token, format=None, filter_results=False):
         False to apply only kernel and uboot config filters, if configs have been uploaded.
         Default: False
 
+    cyclonedx_format : str
+        CycloneDX file format to download report in vex format
+        Default: json
+
+    cyclonedx_version : str
+        CycloneDX spec version to download report in vex format
+        Default: 1.6
+
     Returns
     -------
     file data : bytes
         CVE Report data in bytes from the requested file type
     """
 
-    valid_formats = ["csv", "pdf", "pdfsummary", "xlsx"]
+    valid_formats = ["csv", "pdf", "pdfsummary", "xlsx", "cyclonedx-vex", "cyclonedx-sbom-vex"]
 
     if not report_token:
         raise Exception("report_token is required")
@@ -43,15 +49,17 @@ def download_report(report_token, format=None, filter_results=False):
         "filtered": filter_results,
         "format": format,
     }
+
+    if format.lower() in {"cyclonedx-vex", "cyclonedx-sbom-vex"}:
+        data.update({"sbom_format": cyclonedx_format, "sbom_version": cyclonedx_version})
+
     result = timesys.llapi.GET(resource, data_dict=data, json=False)
 
     return result
 
 
-def compare_reports(token_one, token_two, remove_whitelist=False, filter_results=False):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get comparison between report token_one and report token_two
+def compare_reports(token_one, token_two, remove_whitelist=False, remove_not_affected=False, filter_results=False):
+    """Get comparison between report token_one and report token_two
 
 
     Arguments
@@ -61,7 +69,10 @@ def compare_reports(token_one, token_two, remove_whitelist=False, filter_results
     token_two : str
         Token of the second CVE report
     remove_whitelist : bool
-        Remove whitelisted CVEs from the report if True
+        remove_whitelist is deprecated, use remove_not_affected instead
+        Default: False
+    remove_not_affected : bool
+        Remove Not Affected CVEs from the report if True
         Default: False
     filter_results : bool
         Apply all filters to report if True, else only kernel and uboot config filters if configs have been uploaded.
@@ -85,6 +96,7 @@ def compare_reports(token_one, token_two, remove_whitelist=False, filter_results
         "token_one": token_one,
         "token_two": token_two,
         "remove_whitelist": remove_whitelist,
+        "remove_not_affected": remove_not_affected,
         "filtered": filter_results,
     }
     return timesys.llapi.GET(resource, data)

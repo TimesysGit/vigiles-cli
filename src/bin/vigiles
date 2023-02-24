@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# SPDX-FileCopyrightText: 2022 Timesys Corporation
+# SPDX-FileCopyrightText: 2025 Timesys Corporation
 # SPDX-License-Identifier: MIT
 
 import argparse
@@ -52,7 +52,7 @@ def process_args(argv=None):
     # the base url for requests
     parser.add_argument(
         "-u", "--url",
-        help="Base URL for all requests. Default is: https://linuxlink.timesys.com",
+        help="Base URL for all requests. Default is: https://vigiles.lynx.com",
         dest="url",
     )
 
@@ -74,7 +74,7 @@ def process_args(argv=None):
     # dashboard config path
     parser.add_argument(
         "-d", "--dash-config",
-        help="Path to Dashboard Config file containing Product/Folder tokens. If not configured, the default 'Private Workspace' will be used",
+        help="Path to Dashboard Config file containing Group/Folder tokens. If not configured, the default 'Private Workspace' will be used",
         dest="dash_config",
     )
 
@@ -105,7 +105,7 @@ def process_args(argv=None):
     subparser_manifest = parser_manifest.add_subparsers(dest="manifest_command", help='Which manifest command to execute', required=True)
 
     # get list of manifest tokens
-    subparser_manifest.add_parser("list", help="Get list of tokens of all manifests available for a user. If a Dashboard Config is used, results will be limited to the appropriate Product/Folder")
+    subparser_manifest.add_parser("list", help="Get list of tokens of all manifests available for a user. If a Dashboard Config is used, results will be limited to the appropriate Group/Folder")
 
     # manifest get info (with metadata)
     parser_get_manifest_info = subparser_manifest.add_parser("info",  help="Get manifest data with added metadata")
@@ -125,7 +125,7 @@ def process_args(argv=None):
     manifest_download_group.add_argument("--stdout", dest="stdout", action="store_true", help="Write downloaded bytes to stdout")
 
     # upload manifest
-    parser_upload_manifest = subparser_manifest.add_parser("upload", help="Upload a manifest file. Use a Dashboard Config file to specify destination Product or Folder. Default is 'Private Workspace' Product")
+    parser_upload_manifest = subparser_manifest.add_parser("upload", help="Upload a manifest file. Use a Dashboard Config file to specify destination Group or Folder. Default is 'Private Workspace' Group")
     parser_upload_manifest.add_argument("manifest", action='store', help='Path to a manifest file')
     parser_upload_manifest.add_argument('-k', '--kernel-config', '--kconfig', dest="kernel_config", help="Path to a kernel config file. With sufficient user permissions, it will be used to filter results that are not relevant. Must be a full config, not a defconfig")
     parser_upload_manifest.add_argument('-n', '--manifest-name', dest="manifest_name", help="Custom name for Manifest")
@@ -134,11 +134,13 @@ def process_args(argv=None):
     parser_upload_manifest.add_argument('-o', '--upload-only', action='store_true', dest='upload_only', help='Upload manifest but do not generate a report')
     parser_upload_manifest.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to resulting report (only config filters applied if omitted)')
     parser_upload_manifest.add_argument('-e', '--extra-fields', dest='extra_fields', help='Comma separated list of extra CVE attributes to include if results are returned. Acceptable values are: "assigner", "description", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
+    parser_upload_manifest.add_argument('-E', '--ecosystems', dest='ecosystems', help='Comma separated string of ecosystems that should be used for generating reports')
+    parser_upload_manifest.add_argument('-S', '--subscribe', dest='subscribe', help='Manifest notification frequency.  Acceptable values are: "none", "daily", "weekly", "monthly".  Default is "none".')
 
     # manifest delete
     parser_manifest_delete = subparser_manifest.add_parser("delete", help="Delete a manifest with a given token. This can NOT be undone!")
     parser_manifest_delete.add_argument('manifest_token', metavar="manifest-token", help='Token of the manifest to delete')
-    parser_manifest_delete.add_argument('-c', '--confirm', default=False, action='store_true', dest='confirmed', help="Confirm deletion of manifest", required=True)
+    parser_manifest_delete.add_argument('-c', '--confirm', default=False, action='store_true', dest='confirmed', help="Confirm deletion of manifest")
 
     # manifest rescan
     parser_manifest_rescan = subparser_manifest.add_parser("rescan", help="Generate a new CVE report for a given manifest_token")
@@ -153,6 +155,19 @@ def process_args(argv=None):
     parser_manifest_latest.add_argument('-e', '--extra-fields', dest='extra_fields', help='Comma separated list of extra CVE attributes to include if results are returned. Acceptable values are: "assigner", "description", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
     parser_manifest_latest.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to report (only config filters applied if omitted)')
 
+    # Commands - Manifest Chain Custom Score
+    # ==================
+    parser_custom_score = subparser_manifest.add_parser("custom-score", help="Commands related to the custom score of linked manifests")
+    sub_parser_custom_score = parser_custom_score.add_subparsers(dest="manifest_custom_score_command", help='Which manifest custom score command to execute', required=True)
+
+    # Set cve custom-score in manifest chain
+    parser_manifest_custom_score_set = sub_parser_custom_score.add_parser("set", help="Set cve custom score in linked manifest")
+    parser_manifest_custom_score_set.add_argument('manifest_token', metavar="manifest-token", help='Token of the manifest used to set a custom score on the related chain')
+    parser_manifest_custom_score_set.add_argument('-p', '--product', dest='product', help="Target CPE Product (package_name) name", required=True, type=lambda field: field.strip())
+    parser_manifest_custom_score_set.add_argument('--cve-id', dest='cve_id', help="CVE ID for which you would like to set a custom score", required=True, type=lambda field: field.strip())
+    parser_manifest_custom_score_set.add_argument('-s', '--score', dest='score', help="Custom score value to set", required=True, type=lambda field: field.strip())
+    parser_manifest_custom_score_set.add_argument('-v', '--verison', dest='version', default='', help="Target product version", type=lambda field: field.strip())
+
     # get list of available reports
     parser_get_reports = subparser_manifest.add_parser("reports", help="Get list of reports for a given manifest token")
     parser_get_reports.add_argument("manifest_token", metavar="manifest-token", help="Token of the Manifest to get a list of reports for")
@@ -164,19 +179,22 @@ def process_args(argv=None):
 
     # report download (just bytes)
     parser_report_download = subparser_reports.add_parser("download", help="Get CVE report in a specified file format")
-    parser_report_download.add_argument('file_type', metavar='file-type', help='Filetype for the exported report', choices=["pdf", "pdfsummary", "xlsx", "csv"])
+    parser_report_download.add_argument('file_type', metavar='file-type', help='Filetype for the exported report', choices=["pdf", "pdfsummary", "xlsx", "csv", "cyclonedx-vex", "cyclonedx-sbom-vex"])
     parser_report_download.add_argument('report_token', metavar='report-token', help='Token of the report to download')
     parser_report_download.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to report (only config filters applied if omitted)')
     report_download_group = parser_report_download.add_mutually_exclusive_group(required=True)
     report_download_group.add_argument("-o", "--outfile", dest="outfile", help="Path to output file. Existing files will be overwritten!")
     report_download_group.add_argument("--stdout", dest="stdout", action="store_true", help="Write downloaded bytes to stdout")
+    parser_report_download.add_argument("--cyclonedx-format", dest="cyclonedx_format", default="json", help="CycloneDX file format to download report in VEX format", choices=["json", "xml"])
+    parser_report_download.add_argument("--cyclonedx-version", dest="cyclonedx_version", default="1.6", help="CycloneDX spec version to download report in VEX format", choices=["1.4", "1.5", "1.6"])
 
     # compare two reports
     parser_report_compare = subparser_reports.add_parser("compare", help="Compare two CVE reports with given tokens")
     parser_report_compare.add_argument('token_one', help='Token of the first report')
     parser_report_compare.add_argument('token_two', help='Token of the report to compare to the first report')
-    parser_report_compare.add_argument('-r', '--remove_whitelist', action='store_true', dest='remove_whitelist', help='Remove whitelisted CVEs from the comparison')
+    parser_report_compare.add_argument('-r', '--remove_whitelist', action='store_true', dest='remove_whitelist', help='remove_whitelist is deprecated, use remove_not_affected instead')
     parser_report_compare.add_argument('-f', '--filter_results', action='store_true', default=False, dest='filter_results', help='Apply all filters to reports (only config filters applied if omitted)')
+    parser_report_compare.add_argument('-n', '--remove_not_affected', action='store_true', default=False, dest='remove_not_affected', help='Remove Not Affected CVEs from the comparison')
 
     # Commands - Folder
     # =================
@@ -184,27 +202,83 @@ def process_args(argv=None):
     subparser_folder = parser_folder.add_subparsers(dest="folder_command", help='Which folder command to execute', required=True)
 
     # list folders
-    parser_folder_list = subparser_folder.add_parser("list", help="Get list of tokens of all folders available for a user. If a Dashboard Config is used, results will be limited to the appropriate Product and Folder")
+    parser_folder_list = subparser_folder.add_parser("list", help="Get list of tokens of all folders available for a user. If a Dashboard Config is used, results will be limited to the appropriate Group and Folder")
     parser_folder_list_token_exclusive = parser_folder_list.add_mutually_exclusive_group()
-    parser_folder_list_token_exclusive.add_argument('-p', '--product_token', dest="product_token", help="Optionally filter the folder list by the specified product token")
+    parser_folder_list_token_exclusive.add_argument('-g', '--group_token', dest="group_token", help="Optionally filter the folder list by the specified group token")
     parser_folder_list_token_exclusive.add_argument('-f', '--folder_token', dest="folder_token", help="Optionally filter the folder list by the specified folder token")
 
-    # Commands - Product
+    # create folder
+    parser_folder_create = subparser_folder.add_parser("create", help="Create a new folder")
+    parser_folder_create.add_argument('folder_name', metavar="folder-name", help="Name for the new folder")
+    parser_folder_create.add_argument('-d', '--description', dest='description', help="Optional description for the new folder")
+    parser_folder_create_location_group = parser_folder_create.add_mutually_exclusive_group()
+    parser_folder_create_location_group.add_argument('-g', '--group-token', dest="group_token", help="Optional parent group token to create folder in")
+    parser_folder_create_location_group.add_argument('-f', '--folder-token', dest="folder_token", help="Optional parent folder token to create folder in")
+
+    # Commands - Group
     # ==================
-    parser_product = subparsers.add_parser("product", help="Commands related to products and product tokens")
-    subparser_product = parser_product.add_subparsers(dest="product_command", help='Which product command to execute', required=True)
+    parser_group = subparsers.add_parser("group", help="Commands related to groups and group tokens")
+    subparser_group = parser_group.add_subparsers(dest="group_command", help='Which group command to execute', required=True)
 
-    # product list
-    subparser_product.add_parser("list", help="Get list of tokens of all products available for a user")
+    # group list
+    subparser_group.add_parser("list", help="Get a list of tokens for all of the groups available to a user")
 
-    # product create
-    parser_product_create = subparser_product.add_parser("create", help="Create a new product")
-    parser_product_create.add_argument('product_name', metavar="product-name", help="Name for the new product")
-    parser_product_create.add_argument('-d', '--description', dest='description', help="Optional description for the new product")
+    # group create
+    parser_group_create = subparser_group.add_parser("create", help="Create a new group")
+    parser_group_create.add_argument('group_name', metavar="group-name", help="Name for the new group")
+    parser_group_create.add_argument('-d', '--description', dest='description', help="Optional description for the new group")
+    parser_group_create.add_argument('-g', '--group-token', dest="group_token", help="Optional parent group token to create a subgroup")
 
-    # product info
-    parser_product_info = subparser_product.add_parser("info", help="Get details of a product wit hthe given token")
-    parser_product_info.add_argument('-p', '--product-token', dest='product_token', help="Optional product token for getting info about a different product than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
+    # group delete
+    parser_group_delete = subparser_group.add_parser("delete", help="Delete a group")
+    parser_group_delete.add_argument('group_token', metavar="group_token", help="Token for the group to be deleted")
+
+    # group info
+    parser_group_info = subparser_group.add_parser("info", help="Get details about the group for the given token")
+    parser_group_info.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
+    parser_group_info.add_argument('-s', '--subgroups', action='store_true', default=False, dest='subgroups', help='Optional parameter to include subgroup details')
+
+    # Commands - group settings
+    # ========================
+    parser_group_settings = subparser_group.add_parser("settings", help="Get details about the group settings")
+    subparser_group_settings = parser_group_settings.add_subparsers(dest="settings_command", help='Which group settings command to execute', required=True)
+
+    # view group settings
+    parser_group_settings_info = subparser_group_settings.add_parser("info", help="View group settings")
+    parser_group_settings_info.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
+    
+    # update group settings
+    parser_group_settings_update = subparser_group_settings.add_parser("update", help="Update group settings")
+    parser_group_settings_update.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
+    parser_group_settings_update.add_argument('-i', '--vuln-identifiers', dest='vuln_identifiers', nargs='+', choices=["PURL", "CPE", "CVE Product", "Package Name"])
+    parser_group_settings_update.add_argument('-s', '--vuln-strict-match', dest='vuln_strict_match', choices=["on", "off"])
+
+    # Commands - group members
+    # ========================
+    parser_members = subparser_group.add_parser("members", help="Get a list of all members in a group")
+    subparser_members = parser_members.add_subparsers(dest="member_command", help='Which group member command to execute', required=True)
+    
+    # list group members
+    parser_group_members_list = subparser_members.add_parser("list", help="Get a list of all members in a group")
+    parser_group_members_list.add_argument('group_token', metavar="group_token", help="Token of the group to get its members")
+
+    # Add a member to the group
+    parser_group_add_member = subparser_members.add_parser("add", help="Add a group member")
+    parser_group_add_member.add_argument('group_token', metavar="group_token", help="Token for the group")
+    parser_group_add_member.add_argument('-e', '--member-email', help="Group member email", required=True)
+    parser_group_add_member.add_argument('-r', '--role', help="Role for the group member", required=True)
+    parser_group_add_member.add_argument('-a', '--access-subgroups', action="store_true", default=False, help="Allow access to subgroups. Default is False")
+
+    # Update a group member
+    parser_group_update_member = subparser_members.add_parser("update", help="Update a group member")
+    parser_group_update_member.add_argument('group_token', metavar="group_token", help="Token for the group")
+    parser_group_update_member.add_argument('-e', '--member-email', help="Group member email", required=True)
+    parser_group_update_member.add_argument('-r', '--new-role', help="New role for the group member", required=True)
+
+    # Remove a member from a group
+    parser_group_remove_member = subparser_members.add_parser("remove", help="Remove a member from a group")
+    parser_group_remove_member.add_argument('group_token', metavar="group_token", help="Token for the group")
+    parser_group_remove_member.add_argument('-e', '--member-email', help="Group member email to be removed", required=True)
 
     # Commands - CVEs
     # ===============
@@ -220,7 +294,20 @@ def process_args(argv=None):
     # cve info
     parser_cve_info = subparser_cves.add_parser("info", help="Get info for a given CVE ID")
     parser_cve_info.add_argument('cve_id', help="CVE ID to return info for")
-    parser_cve_info.add_argument('-f', '--fields', dest='fields', help='Optionally limit CVE attributes returned to this comma separated list. Acceptable values are: "affected_configurations", "assigner", "description", "identifier", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
+    parser_cve_info.add_argument('-f', '--fields', dest='fields', help='Optionally limit CVE attributes returned to this comma separated list. Acceptable values are: "affected_configurations", "assigner", "description", "identifier", "impact", "modified", "problem_types", "published", "references", "nvd_status", "cisa", "epss"', type=lambda fields: [f.strip() for f in fields.split(',')])
+
+    # vuln status
+    parser_set_vuln_status = subparser_cves.add_parser("set_status", help="Set the status of a vulnerability")
+    parser_set_vuln_status.add_argument('scope', help='scope to apply status to', choices=['manifest', 'group', 'all'])
+    parser_set_vuln_status.add_argument('cve_id', help="CVE ID to set the status for")
+    parser_set_vuln_status.add_argument('package', help="package name to get CVEs for")
+    parser_set_vuln_status.add_argument('status', help="New status to set", choices=['resolved', 'resolved_with_pedigree', 'exploitable', 'in_triage', 'false_positive', 'not_affected'])
+    parser_set_vuln_status.add_argument('-j', '--justification', help="Justification for the status", choices=['code_not_present', 'code_not_reachable', 'requires_configuration', 'requires_dependency', 'requires_environment', 'protected_by_compiler', 'protected_at_runtime', 'protected_at_perimeter', 'protected_by_mitigating_control'])
+    parser_set_vuln_status.add_argument('-d', '--detail', dest='justification_detail', default='', help="Additional information for the status justification")
+    parser_set_vuln_status.add_argument('-v', '--version', dest='version', default='', help="Version of package to set status for")
+    parser_set_vuln_status.add_argument('-g', '--groups', dest='group_tokens', nargs='*', help='One or more group tokens to apply vuln status to. Should only be used when scope is group')
+    parser_set_vuln_status.add_argument('-m', '--manifests', dest='manifest_tokens', nargs='*', help='One or more manifest tokens to apply vuln status to. Should only be used when scope is manifest')
+
 
     # Return parsed commands
     parsed_args = parser.parse_args()
@@ -251,6 +338,11 @@ if __name__ == '__main__':
     else:
         dash_config_path = None
 
+    # Display vigiles cli version with or without linuxlink key file
+    if parsed_args.command == 'version':
+        print(llapi.version)
+        sys.exit(0)
+
     # Configure LLAPI object
     llapi.configure(
         key_file_path=key_file_path,
@@ -259,14 +351,9 @@ if __name__ == '__main__':
         url=parsed_args.url,
         dry_run=parsed_args.dry_run,
     )
-
     # Call the corresponding API method for the given command line args
     try:
-
-        if parsed_args.command == 'version':
-            print(llapi.version)
-            sys.exit(0)
-        elif parsed_args.command in ['heartbeat', 'test']:
+        if parsed_args.command in ['heartbeat', 'test']:
             result = utilities.heartbeat()
         elif parsed_args.command == "manifest":
             manifest_command = parsed_args.manifest_command
@@ -298,6 +385,8 @@ if __name__ == '__main__':
                     filter_results=parsed_args.filter_results,
                     extra_fields=parsed_args.extra_fields,
                     upload_only=parsed_args.upload_only,
+                    ecosystems=parsed_args.ecosystems,
+                    subscribe=parsed_args.subscribe
                 )
             elif manifest_command == "list":
                 result = vigiles.manifests.get_manifests()
@@ -348,6 +437,15 @@ if __name__ == '__main__':
                     filter_results=parsed_args.filter_results,
                     extra_fields=parsed_args.extra_fields,
                 )
+            elif manifest_command == 'custom-score':
+                if parsed_args.manifest_custom_score_command == 'set':
+                    result = vigiles.manifests.set_custom_score(
+                        parsed_args.manifest_token,
+                        parsed_args.product,
+                        parsed_args.cve_id,
+                        parsed_args.score,
+                        product_version=parsed_args.version,
+                    )
             else:
                 raise Exception(f'Unhandled manifest command: {parsed_args.manifest_command}')
         elif parsed_args.command == "report":
@@ -357,6 +455,8 @@ if __name__ == '__main__':
                     parsed_args.report_token,
                     format=parsed_args.file_type,
                     filter_results=parsed_args.filter_results,
+                    cyclonedx_format=parsed_args.cyclonedx_format,
+                    cyclonedx_version=parsed_args.cyclonedx_version
                 )
 
                 if not result.endswith(b'\n'):
@@ -375,27 +475,75 @@ if __name__ == '__main__':
                     parsed_args.token_two,
                     filter_results=parsed_args.filter_results,
                     remove_whitelist=parsed_args.remove_whitelist,
+                    remove_not_affected=parsed_args.remove_not_affected,
                 )
         elif parsed_args.command == "folder":
             folder_command = parsed_args.folder_command
             if folder_command == "list":
                 result = vigiles.folders.get_folders(
-                    parsed_args.product_token,
+                    parsed_args.group_token,
                     parsed_args.folder_token
                 )
-        elif parsed_args.command == "product":
-            product_command = parsed_args.product_command
-            if product_command == "create":
-                result = vigiles.products.create_product(
-                    parsed_args.product_name,
-                    product_description=parsed_args.description,
+            if folder_command == "create":
+                result = vigiles.folders.create_folder(
+                    parsed_args.folder_name,
+                    parsed_args.description,
+                    parsed_args.group_token,
+                    parsed_args.folder_token
                 )
-            elif product_command == "list":
-                result = vigiles.products.get_products()
-            elif product_command == "info":
-                result = vigiles.products.get_product_info(
-                    product_token=parsed_args.product_token,
+
+        elif parsed_args.command == "group":
+            group_command = parsed_args.group_command
+            if group_command == "create":
+                result = vigiles.groups.create_group(
+                    parsed_args.group_name,
+                    group_description=parsed_args.description,
+                    group_token=parsed_args.group_token,
                 )
+            elif group_command == "list":
+                result = vigiles.groups.get_groups()
+            elif group_command == "info":
+                result = vigiles.groups.get_group_info(
+                    group_token=parsed_args.group_token,
+                    subgroups=parsed_args.subgroups,
+                )
+            elif group_command == "delete":
+                result = vigiles.groups.delete_group(group_token=parsed_args.group_token)
+            elif group_command == "members":
+                member_command = parsed_args.member_command
+                if member_command == "list":
+                    result = vigiles.groups.get_group_members(group_token=parsed_args.group_token)
+                elif member_command == "add":
+                    result = vigiles.groups.add_group_member(
+                        group_token=parsed_args.group_token,
+                        member_email=parsed_args.member_email,
+                        role=parsed_args.role,
+                        access_subgroups=parsed_args.access_subgroups
+                    )
+                elif member_command == "update":
+                    result = vigiles.groups.update_group_member(
+                        group_token=parsed_args.group_token,
+                        member_email=parsed_args.member_email,
+                        new_role=parsed_args.new_role
+                    )
+                elif member_command == "remove":
+                    result = vigiles.groups.remove_group_member(
+                        group_token=parsed_args.group_token,
+                        member_email=parsed_args.member_email
+                    )
+            elif group_command == "settings":
+                settings_command = parsed_args.settings_command
+                if settings_command == "update":
+                    result = vigiles.groups.update_group_settings(
+                        group_token=parsed_args.group_token,
+                        vuln_identifiers=parsed_args.vuln_identifiers,
+                        vuln_strict_match=parsed_args.vuln_strict_match
+                    )
+                elif settings_command == "info":
+                    result = vigiles.groups.get_group_settings(
+                        group_token=parsed_args.group_token,
+                    )
+
         elif parsed_args.command == "cves":
             cves_command = parsed_args.cves_command
             if cves_command == "search":
@@ -408,6 +556,18 @@ if __name__ == '__main__':
                 result = vigiles.cves.get_cve_info(
                     parsed_args.cve_id,
                     fields=parsed_args.fields,
+                )
+            elif cves_command == "set_status":
+                result = vigiles.cves.set_status(
+                    parsed_args.scope,
+                    parsed_args.cve_id,
+                    parsed_args.package,
+                    parsed_args.status,
+                    parsed_args.justification,
+                    parsed_args.justification_detail,
+                    parsed_args.version,
+                    parsed_args.manifest_tokens,
+                    parsed_args.group_tokens,
                 )
         else:
             raise Exception(f'Unhandled command: {parsed_args.command}')

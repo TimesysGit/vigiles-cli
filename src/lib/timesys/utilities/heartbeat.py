@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2022 Timesys Corporation
+# SPDX-FileCopyrightText: 2023 Timesys Corporation
 # SPDX-License-Identifier: MIT
 
 import timesys
@@ -16,5 +16,5 @@ def heartbeat():
         ok : bool
             True if the server accepted the request and was able to respond
     """
-    resource = "/api/v1/heartbeat"
+    resource = "/api/v1/vigiles/heartbeat"
     return timesys.llapi.POST(resource)

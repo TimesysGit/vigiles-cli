@@ -1,15 +1,15 @@
 Vigiles CLI
 =============================
 
-This project contains a Python package and a command-line tool for interacting with APIs for Timesys services such as `Vigiles <https://www.timesys.com/solutions/vigiles-vulnerability-management/>`_.
+This project contains a Python package and a command-line tool for interacting with APIs for Timesys services such as `Vigiles <https://vigiles.lynx.com/docs/>`_.
 
 
 Requirements
 ============
 
-Usage of the APIs requires a `Key file <https://linuxlink.timesys.com/docs/wiki/engineering/LinuxLink_Key_File>`_ for authentication. The key file contains the user's email address and API key.
+Usage of the APIs requires a `Key file <https://vigiles.lynx.com/docs/vigiles_api_key_file.html>`_ for authentication. The key file contains the user's email address and API key.
 
-For configuring the Vigiles subpackage to use specific Product or Folder locations, refer to the `Dashboard Config <https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config>`_ documentation. Dashboard Config files are downloaded from Product pages on the `Vigiles Dashboard <https://linuxlink.timesys.com/vigiles/>`_ and passed to the core LLAPI object's ``configure`` method. Product and Folder tokens may also be set directly on that object without a file.
+For configuring the Vigiles subpackage to use specific Group or Folder locations, refer to the `Dashboard Config <https://vigiles.lynx.com/docs/index.html#dashboard-config>`_ documentation. Dashboard Config files are downloaded from Group pages on the `Vigiles Dashboard <https://vigiles.lynx.com/>`_ and passed to the core LLAPI object's ``configure`` method. Group and Folder tokens may also be set directly on that object without a file.
 
 
 Getting Started
@@ -75,7 +75,7 @@ To test your implementation, you can configure this module in a "dry run" mode w
     >>> timesys.llapi.configure(key_file_path='/path/to/linuxlink_key', dry_run=True)
     Dry Run mode is enabled. No requests will be made.
     >>> timesys.utilities.heartbeat()
-    {'headers': {'X-Auth-Signature': b'<token here>'}, 'method': 'POST', 'url': 'https://linuxlink.timesys.com/api/v1/heartbeat', 'data': {'email': 'user@example.com'}, 'hmac_msg': b'POST/api/v1/heartbeatemail=user@example.com'}
+    {'headers': {'X-Auth-Signature': b'<token here>'}, 'method': 'POST', 'url': 'https://vigiles.lynx.com/api/v1/heartbeat', 'data': {'email': 'user@example.com'}, 'hmac_msg': b'POST/api/v1/heartbeatemail=user@example.com'}
 
 
 .. toctree::
