@@ -28,14 +28,14 @@ API key.
 For configuring the Vigiles CLI to use specific Product or Folder
 locations, refer to the [Dashboard
 Config](https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config)
-documentation. Dashboard Config files are downloaded from Product pages
+documentation. Dashboard Config files can be downloaded from Product pages
 on the [Vigiles Dashboard](https://linuxlink.timesys.com/vigiles/) 
 
 ### Getting Started
 
 #### Command Line
 
-This tool is installed as a command `vigiles`. 
+This tool is installed as the command `vigiles`. 
 To get started with the command line, try specifying a keyfile and checking the `heartbeat` command, which should look like this:
 
 ```
@@ -49,7 +49,7 @@ Note: If you put the Key File in the default location ($HOME/timesys/linuxlink_k
 Vigiles Scanner (scan command)
 ==============================
 
-This Vigiles CLI sub-command is useful for SBOM generation (through Timesys recommended SBOM generator tools) and Vulnerability reporting with 
+This Vigiles CLI sub-command is useful for SBOM generation (through Timesys recommended SBOM generator tools) and Vulnerability reporting with the 
 **[Timesys Vigiles](https://www.timesys.com/security/vigiles/)** product offering.
 
 Supported SBOM generator tools
@@ -65,7 +65,7 @@ Using Vigiles Scanner
 To generate a vulnerability report, follow the below steps: 
 
 
-1. Run **Vigiles Scanner** (vigiles scan) to search for Timesys recommended SBOM generator tool for your ecosystem
+1. Run the **Vigiles Scanner** (vigiles scan) to search for Timesys recommended SBOM generator tool for your ecosystem
     ```sh
     vigiles scan -e "{ecosystem}"
     ```
@@ -76,8 +76,8 @@ To generate a vulnerability report, follow the below steps:
 
 2. Run **Vigiles Scanner** (vigiles scan) with your selection of **SBOM generator tool**, and **source**.
 
-    > NOTE: Before this step ensure that the SBOM generator tool you want to use it with is already
-      **```installed/set up```** (you may find installation/setup instructions for the SBOM generator tool in 
+    > NOTE: Ensure that the SBOM generator tool you want to use it with is already
+      **```installed and configured```** (You may find additional instructions for the SBOM generator tool in 
       the link given under the ```Supported SBOM generator tools``` section).
 
     ```sh
