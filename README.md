@@ -54,8 +54,8 @@ This Vigiles CLI sub-command is useful for SBOM generation (through Timesys reco
 
 Supported SBOM generator tools
 ==============================
- - [syft](https://github.com/anchore/syft)
-
+ - [SYFT<sup>TM</sup>](https://github.com/anchore/syft) 
+ 
 > NOTE: refer to individual SBOM generator tool documentation to learn installation and setup procedure and tool-supported arguments and usage
 
 
@@ -107,3 +107,6 @@ To generate a vulnerability report, follow the below steps:
             View detailed online report at:
               https://linuxlink.timesys.com/cves/reports/<Unique Report Identifier>
     ```
+
+### Disclaimer
+* **SYFT** is a trademark of **Anchore, Inc**
