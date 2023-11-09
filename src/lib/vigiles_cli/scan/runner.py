@@ -52,15 +52,15 @@ def print_sbom_tools(tools, search=None):
     print("\n\tList of Timesys recommended SBOM generator tools \n")
     print("*" * 80)
     if search:
-        print("Name \tEcosystem\t URL")
+        print("%-18s %-12s %s" % ("Name", "Ecosystem", "URL"))
     else:
-        print("Name \t\t Ecosystems")
+        print("%-25s %s" % ("Name", "Ecosystems"))
     print("-" * 80)
     for tool, ecosystems in tools.items():
         if search:
-            print("%s \t%s\t\t %s" % (tool, search, ecosystems.get("url", [])))
+            print("%-18s %-12s %s" % (tool, search, ecosystems.get("url", [])))
         else:
-            print("%s \t\t %s" % (tool, ",".join(ecosystems.get("ecosystems", []))))
+            print("%-25s %s" % (tool, ",".join(ecosystems.get("ecosystems", []))))
     print("-" * 80)
     if search:
         print(
