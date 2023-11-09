@@ -20,7 +20,7 @@ This Vigiles-cli sub-command is useful for SBOM generation (through Timesys reco
 
 Supported SBOM generator tools
 ==============================
- - `syft <https://github.com/anchore/syft>`_
+ - `SYFT`:sup:`TM` (https://github.com/anchore/syft)
 
 NOTE: refer to individual SBOM generator tool documentation to learn installation and setup procedure and tool-supported arguments and usage
 
@@ -204,6 +204,11 @@ and SBOM generator tool version can be printed with **--version**.
 
    modules
 
+
+Disclaimer
+==========
+
+**SYFT** is a trademark of **Anchore, Inc**.
 
 Indices and tables
 ==================
