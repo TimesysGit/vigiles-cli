@@ -25,7 +25,7 @@ def get_cve_info(cve_id, fields=None):
         CVE data, optionally filtered to the requested fields
     """
     if not cve_id:
-        raise Exception("cve_id is required")
+        raise Exception("cve_id is required.")
 
     resource = f"/api/v1/vigiles/cves/{cve_id}"
     data = {}
@@ -57,7 +57,7 @@ def search_cves_by_product(cpe_product, version="", ids_only=False):
     """
 
     if not cpe_product:
-        raise Exception('cpe_product is required')
+        raise Exception('cpe_product is required.')
 
     resource = "/api/v1/vigiles/cves"
     data = {

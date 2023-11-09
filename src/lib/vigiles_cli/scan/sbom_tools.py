@@ -16,7 +16,7 @@ class Syft(SbomTool):
     @staticmethod
     def get_sbom_path(tool_args):
         if "--output" not in tool_args and "-o" not in tool_args:
-            raise Exception("couldn't identify sbom marker in the argument")
+            raise Exception("Could not identify sbom marker in the argument.")
         return tool_args.split("-o")[-1].split("=")[-1].split(" ")[0].strip()
 
     @staticmethod

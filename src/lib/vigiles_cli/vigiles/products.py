@@ -45,7 +45,7 @@ def create_product(product_name, product_description=None):
     """
 
     if not product_name:
-        raise Exception("product_name is required")
+        raise Exception("product_name is required.")
 
     resource = "/api/v1/vigiles/products"
     data = {"name": product_name}
@@ -89,7 +89,7 @@ def get_product_info(product_token=None):
         product_token = timesys.llapi.product_token
 
     if not product_token:
-        raise Exception('product_token is required either as a parameter or configured on the llapi object')
+        raise Exception('product_token is required either as a parameter or configured on the llapi object.')
 
     resource = f"/api/v1/vigiles/products/{product_token}"
     return timesys.llapi.GET(resource)

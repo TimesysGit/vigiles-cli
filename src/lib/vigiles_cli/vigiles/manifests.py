@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def get_manifests():
     """**Access to this route requires a Vigiles prime subscription.**
 
-    Get all manifests that are accessible by the current user
+    Get all SBOMs that are accessible by the current user
 
     Product or folder tokens can be configured to limit results, but only one
     may be provided. If configured on the llapi object, folder token takes
@@ -19,17 +19,17 @@ def get_manifests():
     Returns
     -------
     list of dict
-        Each manifest in the returned list is a dictionary with the following keys:
+        Each SBOM in the returned list is a dictionary with the following keys:
             manifest_name
-                Name of the manifest
+                Name of the SBOM
             manifest_token
-                Token representing the manifest
+                Token representing the SBOM
             product_token
-                Token representing the Product which the manifest belongs to
+                Token representing the Product which the SBOM belongs to
             folder_token
-                Token representing the Folder which the manifest belongs to
+                Token representing the Folder which the SBOM belongs to
             upload_date
-                Date the manifest was uploaded
+                Date the SBOM was uploaded
 
 
     """
@@ -51,39 +51,39 @@ def get_manifests():
 def get_manifest_info(manifest_token, sbom_format=None):
     """**Access to this route requires a Vigiles prime subscription.**
 
-    Get manifest data along with metadata
+    Get SBOM data along with metadata
 
     Parameters
     ----------
     sbom_format : str, optional
-        If specified, the server will convert the manifest data to this format.
+        If specified, the server will convert the SBOM data to this format.
 
         Acceptable formats are:
             "spdx"
-                Convert the manifest to SPDX format before returning it
+                Convert the SBOM to SPDX format before returning it
 
     Returns
     -------
     dict
         Result of the request with keys:
             manifest_token
-                Token representing the manifest
+                Token representing the SBOM
             manifest_name
-                Name of the manifest with the given token
+                Name of the SBOM with the given token
             folder_token
-                Token representing a Folder the manifest belongs to
+                Token representing a Folder the SBOM belongs to
             product_token
-                Token representing a Product the manifest belongs to
+                Token representing a Product the SBOM belongs to
             upload_date
-                Date the manifest was uploaded
+                Date the SBOM was uploaded
             manifest_data
-                Contents of the manifest
+                Contents of the SBOM
                 By default this is the same format as it was uploaded, unless
                 converted due to the "sbom_format" parameter
     """
 
     if not manifest_token:
-        raise Exception("manifest_token is required")
+        raise Exception("manifest_token is required.")
 
     data = {}
     if sbom_format is not None:
@@ -96,27 +96,27 @@ def get_manifest_info(manifest_token, sbom_format=None):
 def get_manifest_file(manifest_token, sbom_format=None):
     """**Access to this route requires a Vigiles prime subscription.**
 
-    Get manifest data as a file
+    Get SBOM data as a file
 
     Response does not include other metadata such as product/folder tokens.
 
     Parameters
     ----------
     sbom_format : str, optional
-        If specified, the server will convert the manifest data to the specified format.
+        If specified, the server will convert the SBOM data to the specified format.
 
         Acceptable formats are:
             "spdx"
-                Convert the manifest to SPDX format before returning it
+                Convert the SBOM to SPDX format before returning it
 
     Returns
     -------
     bytes
-        The raw manifest file bytes
+        The raw SBOM file bytes
     """
 
     if not manifest_token:
-        raise Exception("manifest_token is required")
+        raise Exception("manifest_token is required.")
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}"
     data = {'send_file': True}
@@ -125,9 +125,8 @@ def get_manifest_file(manifest_token, sbom_format=None):
     return timesys.llapi.GET(resource, data_dict=data, json=False)
 
 
-def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, subfolder_name=None,
-                    filter_results=False, extra_fields=None, upload_only=False):
-    """Upload and scan (optionally) a manifest
+def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False):
+    """Upload and scan (optionally) an SBOM
 
     If a product_token is configured on the llapi object, it will be used as the upload location.
     Otherwise, the default is "Private Workspace."
@@ -136,22 +135,22 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     be the upload location.
 
     A subfolder name can optionally be supplied in order to upload to or create a folder under the
-    configured product and folder. This will then be the upload target for the given manifest.
+    configured product and folder. This will then be the upload target for the given SBOM.
     This is not supported for "Private Workspace".
 
     Parameters
     ----------
     manifest : str
-        String of manifest data to upload
+        String of SBOM data to upload
     kernel_config : str, optional
         Kernel config data used to filter out CVEs which are irrelevant to the built kernel
     uboot_config : str, optional
         Uboot config data used to filter out CVEs which are irrelevant to the built bootloader
     manifest_name : str, optional
-        Name to give the new manifest. If not provided, one will be generated and returned.
+        Name to give the new SBOM. If not provided, one will be generated and returned.
     subfolder_name : str, optional
         If given, a new folder will be created with this name under the configured product or folder,
-        and the manifest will be uploaded to this new folder. If the subfolder already exists, it will be uploaded there.
+        and the SBOM will be uploaded to this new folder. If the subfolder already exists, it will be uploaded there.
         Not supported for "Private Workspace" Product.
     filter_results : bool
         True to apply all configured filters to scan results, False to apply only kernel and uboot config filters.
@@ -161,7 +160,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         Optionally extend CVE data included in report with any of the following fields:
             "assigner", "description", "impact", "modified", "problem_types", "published", "references"
     upload_only : bool
-        If true, do not generate an initial CVE report for the uploaded manifest
+        If true, do not generate an initial CVE report for the uploaded SBOM
         Default: False
 
     Returns
@@ -170,11 +169,11 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         Results of scan with keys:
 
         manifest_token
-            Token of the manifest which was scanned
+            Token of the SBOM which was scanned
         product_token
-            Token of the product that the manifest belongs to
+            Token of the product that the SBOM belongs to
         folder_token
-            Token of the folder that the manifest belongs to
+            Token of the folder that the SBOM belongs to
         cves : list of dict
             list of dictionaries containing information about CVEs found in the scan, also referred to as the "report."
         counts : dict
@@ -186,11 +185,11 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
             URL where the report can be viewed on the web.
             The report token may also be split from the end of this string.
         exported_manifest
-            The manifest data in SPDX format
+            The SBOM data in SPDX format
     """
 
     if not manifest:
-        raise Exception('manifest data is required')
+        raise Exception('SBOM data is required.')
 
     resource = "/api/v1/vigiles/manifests"
 
@@ -214,7 +213,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
 
     if extra_fields is not None:
         if not isinstance(extra_fields, list) or not all(isinstance(i, str) for i in extra_fields):
-            raise Exception("Parameter 'extra_fields' must be a list of strings") from None
+            raise Exception("Parameter 'extra_fields' must be a list of strings.") from None
         data["with_field"] = extra_fields  # will be split into repeated params
 
     product_token = timesys.llapi.product_token
@@ -224,11 +223,10 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     if product_token:
         data["product_token"] = product_token
     else:
-        logger.warning('No product token is configured. Upload target will be "Private Workspace"')
+        logger.warning('No product token is configured. Upload target will be "Private Workspace".')
 
     if not product_token and (folder_token or subfolder_name):
-        logger.warning(
-            '"Private Workspace" does not support folders. Since a product token is not configured, the folder_token and subfolder_name arguments will be ignored.')
+        logger.warning('"Private Workspace" does not support folders. Since a product token is not configured, the folder_token and subfolder_name arguments will be ignored.')
 
     return timesys.llapi.POST(resource, data)
 
@@ -241,9 +239,9 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
     Parameters
     ---------
     manifest_token : str
-        Token for the manifest to rescan
+        Token for the SBOM to rescan
     rescan_only : bool
-        If True, rescan the manifest but not return the report data
+        If True, rescan the SBOM but not return the report data
         Default: False
     filter_results : bool
         Apply all filters to report if True, else only config filters if available.
@@ -258,11 +256,11 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
         Results of scan with keys:
 
         manifest_token
-            Token of the manifest which was scanned
+            Token of the SBOM which was scanned
         product_token
-            Token of the product that the manifest belongs to
+            Token of the product that the SBOM belongs to
         folder_token
-            Token of the folder that the manifest belongs to
+            Token of the folder that the SBOM belongs to
         cves : list of dict
             list of dictionaries containing information about CVEs found in the scan, also referred to as the "report."
         counts : dict
@@ -274,10 +272,10 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
             URL where the report can be viewed on the web.
             The report token may also be split from the end of this string.
         exported_manifest
-            The manifest data in SPDX format
+            The SBOM data in SPDX format
     """
     if not manifest_token:
-        raise Exception('manifest_token is required')
+        raise Exception('manifest_token is required.')
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}/reports"
     data = {
@@ -288,7 +286,7 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
 
     if extra_fields is not None:
         if not isinstance(extra_fields, list) or not all(isinstance(i, str) for i in extra_fields):
-            raise Exception("Parameter 'extra_fields' must be a list of strings") from None
+            raise Exception("Parameter 'extra_fields' must be a list of strings.") from None
         data["with_field"] = extra_fields  # will be split into repeated params
 
     return timesys.llapi.POST(resource, data)
@@ -297,7 +295,7 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
 def delete_manifest(manifest_token, confirmed=False):
     """**Access to this route requires a Vigiles prime subscription.**
 
-    Delete a manifest with the given token
+    Delete an SBOM with the given token
 
     This action can not be undone. It requires passing True for the
     'confirmed' keyword parameter to prevent accidental use.
@@ -305,7 +303,7 @@ def delete_manifest(manifest_token, confirmed=False):
     Parameters
     ---------
     manifest_token : str
-        Token of the manifest to be deleted
+        Token of the SBOM to be deleted
 
     Returns
     -------
@@ -321,7 +319,7 @@ def delete_manifest(manifest_token, confirmed=False):
     """
 
     if not manifest_token:
-        raise Exception("manifest_token is required")
+        raise Exception("manifest_token is required.")
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}"
     data = {"confirmed": confirmed}
@@ -336,19 +334,19 @@ def get_report_tokens(manifest_token):
     Parameters
     ----------
     manifest_token : str
-        Token of the manifest for which to retrieve a list of available reports
+        Token of the SBOM for which to retrieve a list of available reports
 
     Returns
     -------
     dict
-        A dictionary with meta info about the requested manifest and a list of report info
+        A dictionary with meta info about the requested SBOM and a list of report info
 
         dictionaries, each of which contain the keys:
             "created_date", "report_token", "manifest_token", "manifest_version"
     """
 
     if not manifest_token:
-        raise Exception("manifest_token is required")
+        raise Exception("manifest_token is required.")
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}/reports"
     return timesys.llapi.GET(resource)
@@ -357,12 +355,12 @@ def get_report_tokens(manifest_token):
 def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
     """**Access to this route requires a Vigiles prime subscription.**
 
-    Download the latest report for a manifest with the given token.
+    Download the latest report for an SBOM with the given token.
 
     Parameters
     ----------
     manifest_token : str
-        Token of the manifest for which to fetch the latest report
+        Token of the SBOM for which to fetch the latest report
     filter_results : bool
         apply all filters to report if True, else only config filters.
         Default: False
@@ -376,11 +374,11 @@ def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
         Results of scan with keys:
 
         manifest_token
-            Token of the manifest which was scanned
+            Token of the SBOM which was scanned
         product_token
-            Token of the product that the manifest belongs to
+            Token of the product that the SBOM belongs to
         folder_token
-            Token of the folder that the manifest belongs to
+            Token of the folder that the SBOM belongs to
         cves : list of dict
             list of dictionaries containing information about CVEs found in the scan, also referred to as the "report."
         counts : dict
@@ -397,7 +395,7 @@ def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
     """
 
     if not manifest_token:
-        raise Exception("manifest_token is required")
+        raise Exception("manifest_token is required.")
 
     data = {
         'filtered': filter_results,
@@ -405,7 +403,7 @@ def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
 
     if extra_fields is not None:
         if not isinstance(extra_fields, list) or not all(isinstance(i, str) for i in extra_fields):
-            raise Exception("Parameter 'extra_fields' must be a list of strings") from None
+            raise Exception("Parameter 'extra_fields' must be a list of strings.") from None
         data["with_field"] = extra_fields  # will be split into repeated params
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}/reports/latest"

@@ -32,7 +32,7 @@ def download_report(report_token, format=None, filter_results=False):
     valid_formats = ["csv", "pdf", "pdfsummary", "xlsx"]
 
     if not report_token:
-        raise Exception("report_token is required")
+        raise Exception("report_token is required.")
 
     if format not in valid_formats:
         raise Exception("Invalid or missing 'format' arg. "
@@ -78,7 +78,7 @@ def compare_reports(token_one, token_two, remove_whitelist=False, filter_results
     """
 
     if not (token_one and token_two):
-        raise Exception("Two CVE report token arguments are required for comparison")
+        raise Exception("Two CVE report token arguments are required for comparison.")
 
     resource = "/api/v1/vigiles/reports/compare"
     data = {

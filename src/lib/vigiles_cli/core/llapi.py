@@ -61,7 +61,7 @@ class LLAPI:
             email = key_info["email"].strip()
             key = key_info["key"].strip().encode('utf-8')
         except Exception as e:
-            raise Exception("Invalid or missing data in key file") from None
+            raise Exception("Invalid or missing data in key file.") from None
 
         return (email, key)
 
@@ -194,7 +194,7 @@ class LLAPI:
 
     def _do_api_call(self, request_dict, json_response):
         if not self.configured:
-            raise Exception('LLAPI object is not configured properly') from None
+            raise Exception('LLAPI object is not configured properly.') from None
 
         if self.dry_run:
             return request_dict
@@ -203,7 +203,7 @@ class LLAPI:
             method = request_dict.pop('method')
             url = request_dict.pop('url')
         except KeyError as e:
-            raise Exception('_do_api_call: Missing required key: %s' % e.args[0]) from None
+            raise Exception('_do_api_call: Missing required key: "%s".' % e.args[0]) from None
 
         try:
             # only filter the InsecureRequestWarning for our call, rather than globally
@@ -223,7 +223,7 @@ class LLAPI:
         except requests.exceptions.ConnectionError as e:
             raise Exception(f"Connection could not be made: {e}") from None
         except requests.exceptions.Timeout:
-            raise Exception("Connection attempt timed out") from None
+            raise Exception("Connection attempt timed out.") from None
         except Exception:
             raise
 
