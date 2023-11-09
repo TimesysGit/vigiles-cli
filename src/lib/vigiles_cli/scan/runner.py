@@ -176,10 +176,10 @@ def read_sbom(sbom_file):
 def print_cves(result, outfile=None):
     cves = result.get("cves", {})
     if cves:
-        print("\n\n-- Recipe CVEs --", file=outfile)
+        print("\n\n-- Component CVEs --", file=outfile)
         for pkg, info in cves.items():
             for cve in info:
-                print("\n\tRecipe:  %s" % pkg, file=outfile)
+                print("\n\tComponent:  %s" % pkg, file=outfile)
                 print("\tVersion: %s" % cve["version"], file=outfile)
                 print("\tCVE ID:  %s" % cve["cve_id"], file=outfile)
                 print("\tURL:     %s%s" % (NVD_BASE_URL, cve["cve_id"]), file=outfile)
