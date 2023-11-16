@@ -297,7 +297,7 @@ def vigiles_request(vgls_chk):
     sbom_path = vgls_chk.get("sbom", "")
     sbom_name = vgls_chk.get("sbom_name", "")
     report_path = vgls_chk.get("report", "")
-    product_token = timesys.llapi.product_token if timesys.llapi.product_token else ""
+    group_token = timesys.llapi.group_token if timesys.llapi.group_token else ""
     folder_token = timesys.llapi.folder_token if timesys.llapi.folder_token else ""
     subfolder_name = (
         vgls_chk.get("subfolder_name", "") if vgls_chk.get("subfolder_name") else ""
@@ -315,7 +315,7 @@ def vigiles_request(vgls_chk):
 
     data = {
         "manifest": sbom_data,
-        "product_token": product_token,
+        "group_token": group_token,
         "folder_token": folder_token,
         "subfolder_name": subfolder_name,
         "upload_only": False,

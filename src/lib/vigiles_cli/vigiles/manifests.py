@@ -12,7 +12,7 @@ def get_manifests():
 
     Get all SBOMs that are accessible by the current user
 
-    Product or folder tokens can be configured to limit results, but only one
+    Group or folder tokens can be configured to limit results, but only one
     may be provided. If configured on the llapi object, folder token takes
     precedence.
 
@@ -24,8 +24,8 @@ def get_manifests():
                 Name of the SBOM
             manifest_token
                 Token representing the SBOM
-            product_token
-                Token representing the Product which the SBOM belongs to
+            group_token
+                Token representing the Group which the SBOM belongs to
             folder_token
                 Token representing the Folder which the SBOM belongs to
             upload_date
@@ -38,12 +38,12 @@ def get_manifests():
     data = {}
 
     folder_token = timesys.llapi.folder_token
-    product_token = timesys.llapi.product_token
+    group_token = timesys.llapi.group_token
 
     if folder_token is not None:
         data["folder_token"] = folder_token
-    elif product_token is not None:
-        data["product_token"] = product_token
+    elif group_token is not None:
+        data["group_token"] = group_token
 
     return timesys.llapi.GET(resource, data_dict=data)
 
@@ -72,8 +72,8 @@ def get_manifest_info(manifest_token, sbom_format=None):
                 Name of the SBOM with the given token
             folder_token
                 Token representing a Folder the SBOM belongs to
-            product_token
-                Token representing a Product the SBOM belongs to
+            group_token
+                Token representing a Group the SBOM belongs to
             upload_date
                 Date the SBOM was uploaded
             manifest_data
@@ -98,7 +98,7 @@ def get_manifest_file(manifest_token, sbom_format=None):
 
     Get SBOM data as a file
 
-    Response does not include other metadata such as product/folder tokens.
+    Response does not include other metadata such as group/folder tokens.
 
     Parameters
     ----------
@@ -128,14 +128,14 @@ def get_manifest_file(manifest_token, sbom_format=None):
 def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False):
     """Upload and scan (optionally) an SBOM
 
-    If a product_token is configured on the llapi object, it will be used as the upload location.
+    If a group_token is configured on the llapi object, it will be used as the upload location.
     Otherwise, the default is "Private Workspace."
 
-    If both a product_token and folder_token are configured on the llapi object, the folder will
+    If both a group_token and folder_token are configured on the llapi object, the folder will
     be the upload location.
 
     A subfolder name can optionally be supplied in order to upload to or create a folder under the
-    configured product and folder. This will then be the upload target for the given SBOM.
+    configured group and folder. This will then be the upload target for the given SBOM.
     This is not supported for "Private Workspace".
 
     Parameters
@@ -149,9 +149,9 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     manifest_name : str, optional
         Name to give the new SBOM. If not provided, one will be generated and returned.
     subfolder_name : str, optional
-        If given, a new folder will be created with this name under the configured product or folder,
+        If given, a new folder will be created with this name under the configured group or folder,
         and the SBOM will be uploaded to this new folder. If the subfolder already exists, it will be uploaded there.
-        Not supported for "Private Workspace" Product.
+        Not supported for "Private Workspace" Group.
     filter_results : bool
         True to apply all configured filters to scan results, False to apply only kernel and uboot config filters.
         Default: False
@@ -170,8 +170,8 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
 
         manifest_token
             Token of the SBOM which was scanned
-        product_token
-            Token of the product that the SBOM belongs to
+        group_token
+            Token of the group that the SBOM belongs to
         folder_token
             Token of the folder that the SBOM belongs to
         cves : list of dict
@@ -216,17 +216,17 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
             raise Exception("Parameter 'extra_fields' must be a list of strings.") from None
         data["with_field"] = extra_fields  # will be split into repeated params
 
-    product_token = timesys.llapi.product_token
+    group_token = timesys.llapi.group_token
     folder_token = timesys.llapi.folder_token
     if folder_token:
         data["folder_token"] = folder_token
-    if product_token:
-        data["product_token"] = product_token
+    if group_token:
+        data["group_token"] = group_token
     else:
-        logger.warning('No product token is configured. Upload target will be "Private Workspace".')
+        logger.warning('No group token is configured. Upload target will be "Private Workspace".')
 
-    if not product_token and (folder_token or subfolder_name):
-        logger.warning('"Private Workspace" does not support folders. Since a product token is not configured, the folder_token and subfolder_name arguments will be ignored.')
+    if not group_token and (folder_token or subfolder_name):
+        logger.warning('"Private Workspace" does not support folders. Since a group token is not configured, the folder_token and subfolder_name arguments will be ignored.')
 
     return timesys.llapi.POST(resource, data)
 
@@ -257,8 +257,8 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
 
         manifest_token
             Token of the SBOM which was scanned
-        product_token
-            Token of the product that the SBOM belongs to
+        group_token
+            Token of the group that the SBOM belongs to
         folder_token
             Token of the folder that the SBOM belongs to
         cves : list of dict
@@ -375,8 +375,8 @@ def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
 
         manifest_token
             Token of the SBOM which was scanned
-        product_token
-            Token of the product that the SBOM belongs to
+        group_token
+            Token of the group that the SBOM belongs to
         folder_token
             Token of the folder that the SBOM belongs to
         cves : list of dict
@@ -386,8 +386,8 @@ def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
                 "fixed", "kernel", "toolchain", "unapplied", "unfixed", "upgradable", "whitelisted"
         date
             Date the scan was performed
-        product_path
-            URL where the product can be viewed on the web.
+        group_path
+            URL where the group can be viewed on the web.
         report_path
             URL where the report can be viewed on the web.
             The report token may also be split from the end of this string.

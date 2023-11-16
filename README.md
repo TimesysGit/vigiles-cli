@@ -29,10 +29,10 @@ file](https://linuxlink.timesys.com/docs/wiki/engineering/LinuxLink_Key_File)
 for authentication. The key file contains the user's email address and
 API key.
 
-For configuring the Vigiles CLI to use specific Product or Folder
+For configuring the Vigiles CLI to use specific Group or Folder
 locations, refer to the [Dashboard
 Config](https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config)
-documentation. Dashboard Config files can be downloaded from Product pages
+documentation. Dashboard Config files can be downloaded from Group pages
 on the [Vigiles Dashboard](https://linuxlink.timesys.com/vigiles/) 
 
 ### Getting Started

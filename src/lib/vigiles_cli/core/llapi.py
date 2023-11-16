@@ -25,8 +25,8 @@ class LLAPI:
         These values are required for authentication and must be configured
         before use.
     dashboard_config_path : str, optional
-        Path to Dashboard Config file which may contain a Product or Folder token.
-        Once configured, operations which can be limited to certain Products
+        Path to Dashboard Config file which may contain a Group or Folder token.
+        Once configured, operations which can be limited to certain Groups
         or Folders will use these values.
     url : str, optional
         The base URL for API communication. Default is https://linuxlink.timesys.com
@@ -52,18 +52,22 @@ class LLAPI:
                 key_info = json.load(key_file)
         except Exception as e:
             raise Exception("Unable to read key file: %s\n%s\n\n"
-                            "To generate a vulnerability report a valid LinuxLink API keyfile is required.\n"
-                            "See this document for keyfile information:\n" 
-                            "https://linuxlink.timesys.com/docs/wiki/engineering/LinuxLink_Key_File"
+                            "To generate a vulnerability report a valid API keyfile is required.\n"
+                            "Download an API key from the preferences page and store it in the path below:\n" 
+                            "/home/<user>/timesys/linuxlink_key"
                             % (key_file_path, e)) from None
+
 
         try:
             email = key_info["email"].strip()
-            key = key_info["key"].strip().encode('utf-8')
+            key = key_info["organization_key"].strip().encode('utf-8')
+            url = key_info.get("server_url").strip()
+            if url.endswith("/"):
+                url = url[:-1]
         except Exception as e:
             raise Exception("Invalid or missing data in key file.") from None
 
-        return (email, key)
+        return (email, key, url)
 
     @staticmethod
     def parse_dashboard_config(dashboard_config_path):
@@ -74,7 +78,7 @@ class LLAPI:
             raise Exception(f"Unable to read dashboard config: {dashboard_config_path}: {e}") from None
 
         try:
-            product = dashboard_config_info["product"].strip()
+            group = dashboard_config_info["group"].strip()
         except Exception as e:
             raise Exception(f"Invalid or missing data in dashboard config: {e}") from None
 
@@ -84,7 +88,7 @@ class LLAPI:
             folder = None
 
         return {
-            "product_token": product,
+            "group_token": group,
             "folder_token": folder,
         }
 
@@ -93,7 +97,7 @@ class LLAPI:
         self.email = None
         self.key = None
         self.url = None
-        self.product_token = None
+        self.group_token = None
         self.folder_token = None
         self.verify_cert = None  # Note: unconfigured is the same as True
         self.dry_run = None
@@ -110,7 +114,7 @@ class LLAPI:
             "email": self.email,
             "key": self.key,
             "url": self.url,
-            "product_token": self.product_token,
+            "group_token": self.group_token,
             "folder_token": self.folder_token,
             "verify_cert": self.verify_cert,
             "dry_run": self.dry_run,
@@ -238,11 +242,11 @@ class LLAPI:
 
     def configure(self, key_file_path=None, dashboard_config_path=None, url=None, verify_cert=None, dry_run=None, log_level=None):
         if key_file_path:
-            self.email, self.key = self.parse_keyfile(key_file_path)
+            self.email, self.key, self.url = self.parse_keyfile(key_file_path)
 
         if dashboard_config_path:
             dashboard_config = self.parse_dashboard_config(dashboard_config_path)
-            self.product_token = dashboard_config.get('product_token')
+            self.group_token = dashboard_config.get('group_token')
             self.folder_token = dashboard_config.get('folder_token')
 
         if url is not None:

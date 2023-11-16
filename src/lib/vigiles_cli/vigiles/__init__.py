@@ -5,6 +5,6 @@ from vigiles_cli.vigiles import (
     cves,
     folders,
     manifests,
-    products,
+    groups,
     reports,
 )

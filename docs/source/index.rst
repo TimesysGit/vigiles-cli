@@ -9,7 +9,7 @@ Requirements
 
 Usage of the APIs requires a `Key file <https://linuxlink.timesys.com/docs/wiki/engineering/LinuxLink_Key_File>`_ for authentication. The key file contains the user's email address and API key.
 
-For configuring the Vigiles subpackage to use specific Product or Folder locations, refer to the `Dashboard Config <https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config>`_ documentation. Dashboard Config files are downloaded from Product pages on the `Vigiles Dashboard <https://linuxlink.timesys.com/vigiles/>`_.
+For configuring the Vigiles subpackage to use specific Group or Folder locations, refer to the `Dashboard Config <https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config>`_ documentation. Dashboard Config files are downloaded from Group pages on the `Vigiles Dashboard <https://linuxlink.timesys.com/vigiles/>`_.
 
 
 Vigiles Scanner (scan command)
