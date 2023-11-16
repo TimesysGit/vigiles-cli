@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2022 Timesys Corporation
 # SPDX-License-Identifier: MIT
 
-import timesys
+import vigiles_cli.core as timesys
 
 
 def heartbeat():

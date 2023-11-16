@@ -1,5 +1,6 @@
-# SPDX-FileCopyrightText: 2022 Timesys Corporation
+# SPDX-FileCopyrightText: 2023 Timesys Corporation
 # SPDX-License-Identifier: MIT
+
 import base64
 from collections.abc import Sequence
 import hashlib
@@ -11,22 +12,11 @@ import urllib.parse
 import urllib3
 import warnings
 
-import timesys
+import vigiles_cli as timesys
 
 
 class LLAPI:
     """Interface for configuration and LinuxLink communication
-
-    The "timesys" package holds an instance of this class which is shared by all
-    subpackages and modules. It is instantiated automatically but is not ready for
-    use until it is configured with a LinuxLink API Key, user email, and base
-    URL at a minimum. The email and key are usually specified by a path to a
-    downloaded Keyfile.
-
-    Typical use would not be creating your own instance of this class, but instead
-    calling the "configure" method on the existing, shared timesys.llapi object.
-    The "configure" method takes the same parameters as the class "__init__".
-
 
     Parameters
     ----------
@@ -61,7 +51,11 @@ class LLAPI:
             with open(key_file_path, "r") as key_file:
                 key_info = json.load(key_file)
         except Exception as e:
-            raise Exception("Unable to read key file: %s\n%s" % (key_file_path, e)) from None
+            raise Exception("Unable to read key file: %s\n%s\n\n"
+                            "To generate a vulnerability report a valid LinuxLink API keyfile is required.\n"
+                            "See this document for keyfile information:\n" 
+                            "https://linuxlink.timesys.com/docs/wiki/engineering/LinuxLink_Key_File"
+                            % (key_file_path, e)) from None
 
         try:
             email = key_info["email"].strip()

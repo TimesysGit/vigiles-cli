@@ -1,11 +1,13 @@
-# SPDX-FileCopyrightText: 2022 Timesys Corporation
+# SPDX-FileCopyrightText: 2023 Timesys Corporation
 # SPDX-License-Identifier: MIT
 
-import timesys
+import vigiles_cli.core as timesys
 
 
 def get_folders():
-    """Get all folders that are owned by the current user.
+    """**Access to this route requires a Vigiles prime subscription..**
+
+    Get all folders that are owned by the current user.
 
     If a product token is configured on the llapi object, only folders belonging
     to that product will be returned.

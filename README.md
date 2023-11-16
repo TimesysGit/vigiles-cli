@@ -1,12 +1,8 @@
-# Timesys LinuxLink API Toolkit
+# Timesys Vigiles CLI
 
-This project contains a Python package and a command-line tool for
-interacting with APIs for Timesys services such as
-[Vigiles](https://www.timesys.com/solutions/vigiles-vulnerability-management/).
+This project contains a command-line tool for interacting with [Vigiles](https://www.timesys.com/solutions/vigiles-vulnerability-management/) APIs.
 
-Documentation generated from this repository is hosted at https://linuxlink.timesys.com/docs/api-toolkit
-
-The server-side API endpoint documentation for Vigiles is here: https://linuxlink.timesys.com/docs/vigiles-api-manual
+The server-side API endpoint documentation for Vigiles is [here](https://linuxlink.timesys.com/docs/vigiles-api-manual).
 
 ### Install
 
@@ -16,7 +12,7 @@ From this repository, you can install with pip:
 pip3 install .
 ```
 
-If you want to generate the HTML docs from the source, install the extras too:
+Generate HTML docs from the source:
 
 ```
 pip3 install .[docs]
@@ -29,24 +25,17 @@ file](https://linuxlink.timesys.com/docs/wiki/engineering/LinuxLink_Key_File)
 for authentication. The key file contains the user's email address and
 API key.
 
-For configuring the Vigiles subpackage to use specific Product or Folder
+For configuring the Vigiles CLI to use specific Product or Folder
 locations, refer to the [Dashboard
 Config](https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config)
 documentation. Dashboard Config files are downloaded from Product pages
-on the [Vigiles Dashboard](https://linuxlink.timesys.com/vigiles/) and
-passed to the core LLAPI object's `configure` method. Product and
-Folder tokens may also be set directly on that object without a file.
-
-Most features of the API require a [Vigiles Prime subscription](https://www.timesys.com/solutions/vigiles-vulnerability-management/options/).
+on the [Vigiles Dashboard](https://linuxlink.timesys.com/vigiles/) 
 
 ### Getting Started
 
 #### Command Line
 
-The python package is installed along with a script called `vigiles`. This script demonstrates use of the python package,
-but is also useful in its own right since it exercises each method. For details on the parameters or what is returned, refer
-to the Python package's documentation, or the API documentation.
-
+This tool is installed as a command `vigiles`. 
 To get started with the command line, try specifying a keyfile and checking the `heartbeat` command, which should look like this:
 
 ```
@@ -56,75 +45,65 @@ $ vigiles -k /path/to/linuxlink_key heartbeat
 
 Note: If you put the Key File in the default location ($HOME/timesys/linuxlink_key), you don't need the '-k' option.
 
-#### Python Package
 
-To use the package in your own project, you must first import the LLAPI object and configure
-it. Without calling `timesys.llapi.configure()`, no User email or API key are configured for
-authentication.
+Vigiles Scanner (scan command)
+==============================
 
-```
->>> import timesys
->>> timesys.llapi.configure(key_file_path='/home/user/timesys/linuxlink_key')
->>>
->>> # Or, if also using a Vigiles Dashboard Config file:
->>> timesys.llapi.configure(key_file_path='/home/user/timesys/linuxlink_key', dashboard_config_path='/path/to/config')
-```
+This Vigiles CLI sub-command is useful for SBOM generation (through Timesys recommended SBOM generator tools) and Vulnerability reporting with 
+**[Timesys Vigiles](https://www.timesys.com/security/vigiles/)** product offering.
 
-Verify authentication and server availability:
+Supported SBOM generator tools
+==============================
+ - [syft](https://github.com/anchore/syft)
 
-```
->>> from timesys.utilities import heartbeat
->>> heartbeat()
-{'ok': True}
-```
+> NOTE: refer to individual SBOM generator tool documentation to learn installation and setup procedure and tool-supported arguments and usage
 
-If the heartbeat is ok, you are ready to use any of the toolkit's
-modules!
 
-## Additional Notes
+Using Vigiles Scanner
+=======================
 
-### Logging
+To generate a vulnerability report, follow the below steps: 
 
-It is up to the user to specify any custom handlers or formats for the
-logger if desired. For example:
 
-```
->>> import logging
->>> import timesys
->>>
->>> my_handler = logging.StreamHandler()
->>> my_handler.setLevel(logging.INFO)
->>> formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
->>> my_handler.setFormatter(formatter)
->>> timesys.logger.addHandler(my_handler)
-```
+1. Run **Vigiles Scanner** (vigiles scan) to search for Timesys recommended SBOM generator tool for your ecosystem
+    ```sh
+    vigiles scan -e "{ecosystem}"
+    ```
 
-If you only want to change the log level, such as to hide warnings, you
-can also configure it this way:
+    > Example:
+    > 
+    >```vigiles scan -e python```
 
-```
->>> timesys.llapi.configure(log_level='ERROR')
-```
+2. Run **Vigiles Scanner** (vigiles scan) with your selection of **SBOM generator tool**, and **source**.
 
-### Authentication
+    > NOTE: Before this step ensure that the SBOM generator tool you want to use it with is already
+      **```installed/set up```** (you may find installation/setup instructions for the SBOM generator tool in 
+      the link given under the ```Supported SBOM generator tools``` section).
 
-If you are writing your own API client library, such as in another
-language, please pay special attention to the code in
-`timesys.core.llapi`. the
-LLAPI class has private methods for generating the HMAC
-auth token from the API key. If this is not done exactly the same way as
-the server computes it, the signatures will never match.
+    ```sh
+    vigiles scan -t {name of SBOM generator tool} -s {source to scan for SBOM generation}
+    ```
 
-To test your implementation, you can configure this module in a "dry
-run" mode which will output the auth header as well as the intermediary
-message used to create it (the "hmac_msg" key). Your code
-should be generating the same message and using the same hashing method
-to result in the same token for the header.
+    > Example:
+    > 
+    >```vigiles scan -t syft -s /myproject```
+    > 
+    > Note: valid tool names are restricted to tools written in the *Supported SBOM generator tools* section.
 
-```
->>> import timesys
->>> timesys.llapi.configure(key_file_path='/path/to/linuxlink_key', dry_run=True)
-Dry Run mode is enabled. No requests will be made.
->>> timesys.utilities.heartbeat()
-{'headers': {'X-Auth-Signature': b'<token here>'}, 'method': 'POST', 'url': 'https://linuxlink.timesys.com/api/v1/heartbeat', 'data': {'email': 'user@example.com'}, 'hmac_msg': b'POST/api/v1/heartbeatemail=user@example.com'}
-```
+3. View the Vigiles Vulnerability (Text) Report Locally
+
+    The vulnerability report will be created in the current working directory with the file naming format
+    ```vulnerability-report-{timestamp}.txt``` e.g.:
+    ```sh
+    wc -l vulnerability-report-2023-05-02-10_45_03.txt
+        2900 vulnerability-report-02052023.txt
+    ```
+
+4. View the Vigiles Vulnerability Online Report
+
+    The local vulnerability text report will contain a link to a comprehensive and graphical report, e.g.:
+    ```
+    -- Vigiles Vulnerability Report --
+            View detailed online report at:
+              https://linuxlink.timesys.com/cves/reports/<Unique Report Identifier>
+    ```

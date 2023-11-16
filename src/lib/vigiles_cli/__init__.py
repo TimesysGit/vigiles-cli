@@ -1,13 +1,8 @@
-# SPDX-FileCopyrightText: 2022 Timesys Corporation
+# SPDX-FileCopyrightText: 2023 Timesys Corporation
 # SPDX-License-Identifier: MIT
 
 import logging
 import sys
-from timesys import (
-    core,
-    utilities,
-    vigiles,
-)
 
 if sys.version_info >= (3, 8):
     from importlib import metadata
@@ -21,6 +16,3 @@ except Exception:
 
 
 logger = logging.getLogger(__name__)
-
-# Call timesys.llapi.configure() to finish initializing
-llapi = core.LLAPI()

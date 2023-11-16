@@ -9,7 +9,7 @@ SOURCEDIR     = source
 BUILDDIR      = build
 
 SPHINXAPIDOC  ?= sphinx-apidoc
-MODULEPATH    ?= ../src/lib/timesys
+MODULEPATH    ?= ../src/lib/vigiles_cli
 
 # Put it first so that "make" without argument is like "make help".
 help:

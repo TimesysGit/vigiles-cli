@@ -1,11 +1,13 @@
-# SPDX-FileCopyrightText: 2022 Timesys Corporation
+# SPDX-FileCopyrightText: 2023 Timesys Corporation
 # SPDX-License-Identifier: MIT
 
-import timesys
+import vigiles_cli.core as timesys
 
 
 def get_products():
-    """Get product info for all products available to the current user
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Get product info for all products available to the current user
 
     Returns
     -------
@@ -19,7 +21,9 @@ def get_products():
 
 
 def create_product(product_name, product_description=None):
-    """Create a new product for the current user
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Create a new product for the current user
 
     Parameters
     ----------
@@ -53,7 +57,9 @@ def create_product(product_name, product_description=None):
 
 
 def get_product_info(product_token=None):
-    """Get product information from a product_token
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Get product information from a product_token
 
     If a token is passed, it will be used.
     If no token is passed, but a product_token is configured on the llapi object, it will be used.
