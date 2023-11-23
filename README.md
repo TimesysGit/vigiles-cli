@@ -4,6 +4,10 @@ This project contains a command-line tool for interacting with [Vigiles](https:/
 
 The server-side API endpoint documentation for Vigiles is [here](https://linuxlink.timesys.com/docs/vigiles-api-manual).
 
+### Requirements
+
+ - Python >= 3.6
+
 ### Install
 
 From this repository, you can install with pip:
@@ -54,9 +58,9 @@ This Vigiles CLI sub-command is useful for SBOM generation (through Timesys reco
 
 Supported SBOM generator tools
 ==============================
- - [SYFT<sup>TM</sup>](https://github.com/anchore/syft) 
+ - [SYFT<sup>TM</sup>](https://github.com/anchore/syft) (version - v0.87.1 | v0.78.0 | v0.75.0)
  
-> NOTE: refer to individual SBOM generator tool documentation to learn installation and setup procedure and tool-supported arguments and usage
+> NOTE: refer to individual SBOM generator tool documentation to learn installation and setup procedure and tool-supported arguments and usage.
 
 
 Using Vigiles Scanner
