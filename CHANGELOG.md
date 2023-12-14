@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.1-alpha] - 2023-12-14
+
+### Fixed
+
+* fixes for enterprise edition APIs
+
 ## [v1.0.0-alpha] - 2023-11-23
 
 ### Added
