@@ -1,12 +1,15 @@
-# Timesys LinuxLink API Toolkit
+# Vigiles CLI
 
 This project contains a Python package and a command-line tool for
-interacting with APIs for Timesys services such as
-[Vigiles](https://www.timesys.com/solutions/vigiles-vulnerability-management/).
+interacting with [Vigiles](https://www.timesys.com/solutions/vigiles-vulnerability-management/) APIs.
 
-Documentation generated from this repository is hosted at https://linuxlink.timesys.com/docs/api-toolkit
+Documentation generated from this repository is hosted at https://linuxlink.timesys.com/docs/vigiles-cli
 
 The server-side API endpoint documentation for Vigiles is here: https://linuxlink.timesys.com/docs/vigiles-api-manual
+
+### Requirements
+
+ - Python >= 3.6
 
 ### Install
 
@@ -47,11 +50,17 @@ The python package is installed along with a script called `vigiles`. This scrip
 but is also useful in its own right since it exercises each method. For details on the parameters or what is returned, refer
 to the Python package's documentation, or the API documentation.
 
-To get started with the command line, try specifying a keyfile and checking the `heartbeat` command, which should look like this:
+To get started with the command line, try specifying a keyfile and checking the `heartbeat` command and then uploading an SBOM:
 
 ```
 $ vigiles -k /path/to/linuxlink_key heartbeat
 {'ok': True}
+```
+
+To upload an SBOM to vigiles
+
+```
+$ vigiles -k /path/to/linuxlink_key manifest upload /path/to/SBOM
 ```
 
 Note: If you put the Key File in the default location ($HOME/timesys/linuxlink_key), you don't need the '-k' option.
