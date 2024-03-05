@@ -1,4 +1,4 @@
-Timesys LinuxLink API Toolkit
+Vigiles CLI
 =============================
 
 This project contains a Python package and a command-line tool for interacting with APIs for Timesys services such as `Vigiles <https://www.timesys.com/solutions/vigiles-vulnerability-management/>`_.
@@ -33,7 +33,7 @@ Verify authentication and server availability:
     >>> heartbeat()
     {'ok': True}
 
-If the heartbeat is ok, you are ready to use any of the toolkit's modules!
+If the heartbeat is ok, you are ready to use any of the modules!
 
 
 Additional Notes
