@@ -3,13 +3,13 @@
 This project contains a Python package and a command-line tool for
 interacting with [Vigiles](https://www.timesys.com/solutions/vigiles-vulnerability-management/) APIs.
 
-Documentation generated from this repository is hosted at https://linuxlink.timesys.com/docs/vigiles-cli
+Documentation generated from this repository is hosted at https://linuxlink.timesys.com/docs/enterprise-vigiles-cli
 
-The server-side API endpoint documentation for Vigiles is here: https://linuxlink.timesys.com/docs/vigiles-api-manual
+The server-side API endpoint documentation for Vigiles is here: https://linuxlink.timesys.com/docs/enterprise-vigiles-api-manual
 
 ### Requirements
 
- - Python >= 3.6
+ - Python >= 3.7
 
 ### Install
 
@@ -34,13 +34,12 @@ API key.
 
 For configuring the Vigiles subpackage to use specific Group or Folder
 locations, refer to the [Dashboard
-Config](https://linuxlink.timesys.com/docs/vigiles-vulnerability-monitoring-and-management-user-guide#Dashboard-config)
+Config](https://YOUR_ENTERPRISE_VIGILES_DOMAIN/docs/vigiles_user_guide#dashboard-config)
 documentation. Dashboard Config files are downloaded from Group pages
-on the [Vigiles Dashboard](https://linuxlink.timesys.com/vigiles/) and
+on the [Vigiles Dashboard](https://YOUR_ENTERPRISE_VIGILES_DOMAIN/) and
 passed to the core LLAPI object's `configure` method. Group and
 Folder tokens may also be set directly on that object without a file.
 
-Most features of the API require a [Vigiles Prime subscription](https://www.timesys.com/solutions/vigiles-vulnerability-management/options/).
 
 ### Getting Started
 
@@ -90,6 +89,25 @@ Verify authentication and server availability:
 If the heartbeat is ok, you are ready to use any of the toolkit's
 modules!
 
+## Generate Documentation
+
+If you want to generate documents:
+
+Install dependencies (if not done before)
+
+```
+pip3 install .[docs]
+```
+
+Generate HTML docs
+
+```
+cd docs
+make html
+```
+
+All docs can be found in: {vigiles-cli directoy}/docs/build/html
+
 ## Additional Notes
 
 ### Logging
@@ -135,5 +153,5 @@ to result in the same token for the header.
 >>> timesys.llapi.configure(key_file_path='/path/to/linuxlink_key', dry_run=True)
 Dry Run mode is enabled. No requests will be made.
 >>> timesys.utilities.heartbeat()
-{'headers': {'X-Auth-Signature': b'<token here>'}, 'method': 'POST', 'url': 'https://linuxlink.timesys.com/api/v1/heartbeat', 'data': {'email': 'user@example.com'}, 'hmac_msg': b'POST/api/v1/heartbeatemail=user@example.com'}
+{'headers': {'X-Auth-Signature': b'<token here>'}, 'method': 'POST', 'url': 'https://corp.vigiles.timesys.com/api/v1/heartbeat', 'data': {'email': 'user@example.com'}, 'hmac_msg': b'POST/api/v1/heartbeatemail=user@example.com'}
 ```
