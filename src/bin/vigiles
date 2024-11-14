@@ -221,10 +221,41 @@ def process_args(argv=None):
     parser_group_create.add_argument('-d', '--description', dest='description', help="Optional description for the new group")
     parser_group_create.add_argument('-g', '--group-token', dest="group_token", help="Optional parent group token to create a subgroup")
 
+    # group delete
+    parser_group_delete = subparser_group.add_parser("delete", help="Delete a group")
+    parser_group_delete.add_argument('group_token', metavar="group_token", help="Token for the group to be deleted")
+
     # group info
     parser_group_info = subparser_group.add_parser("info", help="Get details about the group for the given token")
     parser_group_info.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
     parser_group_info.add_argument('-s', '--subgroups', action='store_true', default=False, dest='subgroups', help='Optional parameter to include subgroup details')
+
+    # Commands - group members
+    # ========================
+    parser_members = subparser_group.add_parser("members", help="Get a list of all members in a group")
+    subparser_members = parser_members.add_subparsers(dest="member_command", help='Which group member command to execute', required=True)
+    
+    # list group members
+    parser_group_members_list = subparser_members.add_parser("list", help="Get a list of all members in a group")
+    parser_group_members_list.add_argument('group_token', metavar="group_token", help="Token of the group to get its members")
+
+    # Add a member to the group
+    parser_group_add_member = subparser_members.add_parser("add", help="Add a group member")
+    parser_group_add_member.add_argument('group_token', metavar="group_token", help="Token for the group")
+    parser_group_add_member.add_argument('-e', '--member-email', help="Group member email", required=True)
+    parser_group_add_member.add_argument('-r', '--role', help="Role for the group member", required=True)
+    parser_group_add_member.add_argument('-a', '--access-subgroups', action="store_true", default=False, help="Allow access to subgroups. Default is False")
+
+    # Update a group member
+    parser_group_update_member = subparser_members.add_parser("update", help="Update a group member")
+    parser_group_update_member.add_argument('group_token', metavar="group_token", help="Token for the group")
+    parser_group_update_member.add_argument('-e', '--member-email', help="Group member email", required=True)
+    parser_group_update_member.add_argument('-r', '--new-role', help="New role for the group member", required=True)
+
+    # Remove a member from a group
+    parser_group_remove_member = subparser_members.add_parser("remove", help="Remove a member from a group")
+    parser_group_remove_member.add_argument('group_token', metavar="group_token", help="Token for the group")
+    parser_group_remove_member.add_argument('-e', '--member-email', help="Group member email to be removed", required=True)
 
     # Commands - CVEs
     # ===============
@@ -282,7 +313,6 @@ if __name__ == '__main__':
 
     # Call the corresponding API method for the given command line args
     try:
-
         if parsed_args.command == 'version':
             print(llapi.version)
             sys.exit(0)
@@ -432,6 +462,30 @@ if __name__ == '__main__':
                     group_token=parsed_args.group_token,
                     subgroups=parsed_args.subgroups,
                 )
+            elif group_command == "delete":
+                result = vigiles.groups.delete_group(group_token=parsed_args.group_token)
+            elif group_command == "members":
+                member_command = parsed_args.member_command
+                if member_command == "list":
+                    result = vigiles.groups.get_group_members(group_token=parsed_args.group_token)
+                elif member_command == "add":
+                    result = vigiles.groups.add_group_member(
+                        group_token=parsed_args.group_token,
+                        member_email=parsed_args.member_email,
+                        role=parsed_args.role,
+                        access_subgroups=parsed_args.access_subgroups
+                    )
+                elif member_command == "update":
+                    result = vigiles.groups.update_group_member(
+                        group_token=parsed_args.group_token,
+                        member_email=parsed_args.member_email,
+                        new_role=parsed_args.new_role
+                    )
+                elif member_command == "remove":
+                    result = vigiles.groups.remove_group_member(
+                        group_token=parsed_args.group_token,
+                        member_email=parsed_args.member_email
+                    )
         elif parsed_args.command == "cves":
             cves_command = parsed_args.cves_command
             if cves_command == "search":

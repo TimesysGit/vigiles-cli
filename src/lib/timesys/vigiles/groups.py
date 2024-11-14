@@ -110,3 +110,183 @@ def get_group_info(group_token=None, subgroups=False):
     data = {"subgroups": subgroups}
     
     return timesys.llapi.GET(resource, data_dict=data)
+
+
+def delete_group(group_token):
+    """Deletes a given group/subgroup
+
+    Parameters
+    ----------
+    group_token : str
+        Token of the group to be deleted
+
+    Raises
+    ------
+    Exception
+        If no group_token is provided
+
+    Returns
+    -------
+    dict
+        message: str
+            Success message on successful deletion
+        status_code: int
+            Status code
+    """
+    if not group_token:
+        raise Exception('group_token is required')
+    
+    resource = f"/api/v1/vigiles/groups/{group_token}"
+
+    return timesys.llapi.DELETE(resource)
+
+
+def get_group_members(group_token):
+    """Gets a list of group members
+
+    Parameters
+    ----------
+    group_token : str
+        Token of the group whose members are to be retrieved
+
+    Raises
+    ------
+    Exception
+        If no group_token is provided
+
+    Returns
+    -------
+    dict      
+        group_name : str
+            Name of the group
+        description : str
+            Description of the group
+        token : str
+            Group token
+        group_type : str
+            Type of the group
+        group_members : list of dict
+            An array of objects, representing a group member's details
+    """
+    if not group_token:
+        raise Exception('group_token is required')
+    
+    resource = f"/api/v1/vigiles/groups/{group_token}/members"
+
+    return timesys.llapi.GET(resource)
+
+
+def add_group_member(group_token, member_email, role, access_subgroups=False):
+    """Adds a new member to the specified group.
+
+    Parameters
+    ----------
+    group_token : str
+        Token of the group to which the member is to be added
+    member_email : str
+        Email address of the member to be added
+    role : str
+        Role to assign to the new member
+    access_subgroups : bool, optional
+        If True, user will be allowed access to all the subgroups of the specified group
+
+    Raises
+    ------
+    Exception
+        If any of the required parameters (`group_token`, `member_email`, or `role`) is not provided
+
+    Returns
+    -------
+    dict
+        message: str
+            Success message on successfuly adding the user
+        status_code: int
+            Status code
+    """
+    if not group_token:
+        raise Exception('group_token is required')
+    if not member_email:
+        raise Exception('member_email is required')
+    if not role:
+        raise Exception('role is required')
+        
+    resource = f"/api/v1/vigiles/groups/{group_token}/members"
+    payload = {
+        "member_email": member_email,
+        "role": role,
+        "allow_access_to_subgroups": access_subgroups
+    }
+
+    return timesys.llapi.POST(resource, data_dict=payload, json=True)
+
+
+def update_group_member(group_token, member_email, new_role):
+    """Update the group member
+
+    Parameters
+    ----------
+    group_token : str
+        Token of the group to which the member is to be updated
+    member_email : str
+        Email address of the member to be updated
+    new_role : str
+        New role to assign to the member
+
+    Returns
+    -------
+    dict
+        message: str
+            Success message on successfuly adding the user
+        status_code: int
+            Status code
+
+    Raises
+    ------
+    Exception
+        If any of the required parameters (`group_token`, `member_email`, or `role`) is not provided.
+    """
+    if not group_token:
+        raise Exception('group_token is required')
+    if not member_email:
+        raise Exception('member_email is required')
+    if not new_role:
+        raise Exception('new_role is required')
+        
+    resource = f"/api/v1/vigiles/groups/{group_token}/members/{member_email}"
+    payload = {
+        "new_role": new_role
+    }
+
+    return timesys.llapi.PUT(resource, data_dict=payload, json=True)
+
+def remove_group_member(group_token, member_email):
+    """Remove a user from the specified group
+
+    Parameters
+    ----------
+    group_token : str
+        Token of the group from which the user is to be removed
+    member_email : str
+        Email Address of the user to be removed from the group
+
+    Returns
+    -------
+    dict
+        message: str
+            Success message on successfuly adding the user
+        status_code: int
+            Status code
+
+    Raises
+    ------
+    Exception
+        If any of the required parameters (`group_token`, `member_email`) is not provided.
+    """
+    if not group_token:
+        raise Exception('group_token is required')
+    if not member_email:
+        raise Exception('member_email is required')
+    
+    resource = f"/api/v1/vigiles/groups/{group_token}/members/{member_email}"
+
+    return timesys.llapi.DELETE(resource)
