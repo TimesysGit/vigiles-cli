@@ -58,7 +58,7 @@ def get_manifests():
 
 def get_manifest_info(manifest_token, sbom_format=None):
     """**Access to this route requires a Vigiles prime subscription.**
-    
+
     Get manifest data along with metadata
 
     Parameters
@@ -366,7 +366,7 @@ def get_report_tokens(manifest_token):
     -------
     dict
         A dictionary with meta info about the requested manifest and a list of report info
-        
+
         dictionaries, each of which contain the keys:
             "created_date", "report_token", "manifest_token", "manifest_version"
     """
@@ -434,3 +434,48 @@ def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}/reports/latest"
     return timesys.llapi.GET(resource, data_dict=data)
+
+
+def set_custom_score(manifest_token, product_name, cve_id, custom_score, product_version=None):
+    """**Access to this route requires a Vigiles prime subscription.**
+
+    Set cve custom score in manifest chain.
+
+    Parameters
+    ----------
+    manifest_token : str
+        Token of the manifest used to set a custom score on the related chain
+    product_name : str
+        Target CPE Product (package_name) name
+    cve_id : str
+        CVE ID for which you would like to set a custom score
+    custom_score : str
+        custom score value to set
+    product_version : str, optional
+        Target product version
+
+    Returns
+    -------
+    dict
+        success : bool
+            True or False depending on result of operation
+        message : str
+            Custom CVE score updated.
+
+    """
+
+    if not all([product_name, cve_id, custom_score, manifest_token]):
+        raise Exception("Missing required data from: { product_name, cve_id, custom_score, manifest_token }")
+
+
+    data = {
+        'package_name': product_name,
+        'cve_id': cve_id,
+        'custom_score': custom_score,
+    }
+
+    if product_version is not None:
+        data['package_version'] = product_version
+
+    resource = f"/api/v1/vigiles/manifests/{manifest_token}/custom_scores"
+    return timesys.llapi.POST(resource, data_dict=data)
