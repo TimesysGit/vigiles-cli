@@ -82,10 +82,9 @@ class LLAPI:
         except Exception as e:
             raise Exception(f"Unable to read dashboard config: {dashboard_config_path}: {e}") from None
 
-        try:
-            group = dashboard_config_info["group"].strip()
-        except Exception as e:
-            raise Exception(f"Invalid or missing data in dashboard config: {e}") from None
+        group = dashboard_config_info.get("group", dashboard_config_info.get("product", "")).strip()
+        if not group:
+            raise Exception(f"Invalid or missing 'group' or 'product' data in dashboard config")
 
         if "folder" in dashboard_config_info:
             folder = dashboard_config_info["folder"].strip()
