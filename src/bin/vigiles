@@ -194,8 +194,10 @@ def process_args(argv=None):
     subparser_folder = parser_folder.add_subparsers(dest="folder_command", help='Which folder command to execute', required=True)
 
     # list folders
-    parser_folder_list = subparser_folder.add_parser("list", help="Get list of tokens of all folders available for a user. If a Dashboard Config is used, results will be limited to the appropriate Group")
-    parser_folder_list.add_argument('-g', '--group_token', dest="group_token")
+    parser_folder_list = subparser_folder.add_parser("list", help="Get list of tokens of all folders available for a user. If a Dashboard Config is used, results will be limited to the appropriate Group and Folder")
+    parser_folder_list_token_exclusive = parser_folder_list.add_mutually_exclusive_group()
+    parser_folder_list_token_exclusive.add_argument('-g', '--group_token', dest="group_token", help="Optionally filter the folder list by the specified group token")
+    parser_folder_list_token_exclusive.add_argument('-f', '--folder_token', dest="folder_token", help="Optionally filter the folder list by the specified folder token")
 
     # Commands - Group
     # ==================
@@ -395,7 +397,10 @@ if __name__ == '__main__':
         elif parsed_args.command == "folder":
             folder_command = parsed_args.folder_command
             if folder_command == "list":
-                result = vigiles.folders.get_folders(parsed_args.group_token)
+                result = vigiles.folders.get_folders(
+                    parsed_args.group_token,
+                    parsed_args.folder_token
+                )
         elif parsed_args.command == "group":
             group_command = parsed_args.group_command
             if group_command == "create":

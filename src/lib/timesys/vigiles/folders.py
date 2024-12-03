@@ -4,13 +4,16 @@
 import timesys
 
 
-def get_folders(group_token=None):
+def get_folders(group_token=None, folder_token=None):
     """**Access to this route requires a Vigiles prime subscription..**
 
     Get all folders that are owned by the current user.
 
     If a group token is configured on the llapi object, only folders belonging
     to that group will be returned.
+
+    If a folder token is configured on the llapi object, only folders belonging
+    to that folder will be returned.
 
     Returns
     -------
@@ -21,8 +24,12 @@ def get_folders(group_token=None):
 
     data = {}
     group_token = group_token or timesys.llapi.group_token
-    if group_token:
+    folder_token = folder_token or timesys.llapi.folder_token
+
+    if group_token and not folder_token:
         data["group_token"] = group_token
+    if folder_token:
+        data["folder_token"] = folder_token
 
     resource = "/api/v1/vigiles/folders"
     return timesys.llapi.GET(resource, data_dict=data)
