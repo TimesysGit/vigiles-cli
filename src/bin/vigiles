@@ -199,6 +199,14 @@ def process_args(argv=None):
     parser_folder_list_token_exclusive.add_argument('-g', '--group_token', dest="group_token", help="Optionally filter the folder list by the specified group token")
     parser_folder_list_token_exclusive.add_argument('-f', '--folder_token', dest="folder_token", help="Optionally filter the folder list by the specified folder token")
 
+    # create folder
+    parser_folder_create = subparser_folder.add_parser("create", help="Create a new folder")
+    parser_folder_create.add_argument('folder_name', metavar="folder-name", help="Name for the new folder")
+    parser_folder_create.add_argument('-d', '--description', dest='description', help="Optional description for the new folder")
+    parser_folder_create_location_group = parser_folder_create.add_mutually_exclusive_group()
+    parser_folder_create_location_group.add_argument('-g', '--group-token', dest="group_token", help="Optional parent group token to create folder in")
+    parser_folder_create_location_group.add_argument('-f', '--folder-token', dest="folder_token", help="Optional parent folder token to create folder in")
+
     # Commands - Group
     # ==================
     parser_group = subparsers.add_parser("group", help="Commands related to groups and group tokens")
@@ -401,6 +409,14 @@ if __name__ == '__main__':
                     parsed_args.group_token,
                     parsed_args.folder_token
                 )
+            if folder_command == "create":
+                result = vigiles.folders.create_folder(
+                    parsed_args.folder_name,
+                    parsed_args.description,
+                    parsed_args.group_token,
+                    parsed_args.folder_token
+                )
+
         elif parsed_args.command == "group":
             group_command = parsed_args.group_command
             if group_command == "create":
