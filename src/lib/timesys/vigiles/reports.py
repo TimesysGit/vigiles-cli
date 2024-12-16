@@ -4,7 +4,7 @@
 import timesys
 
 
-def download_report(report_token, format=None, filter_results=False):
+def download_report(report_token, format=None, filter_results=False, cyclonedx_format="json", cyclonedx_version="1.6"):
     """**Access to this route requires a Vigiles prime subscription.**
 
     Get a CVE report as a file from the given report token
@@ -23,13 +23,21 @@ def download_report(report_token, format=None, filter_results=False):
         False to apply only kernel and uboot config filters, if configs have been uploaded.
         Default: False
 
+    cyclonedx_format : str
+        CycloneDX file format to download report in vex format
+        Default: json
+
+    cyclonedx_version : str
+        CycloneDX spec version to download report in vex format
+        Default: 1.6
+
     Returns
     -------
     file data : bytes
         CVE Report data in bytes from the requested file type
     """
 
-    valid_formats = ["csv", "pdf", "pdfsummary", "xlsx"]
+    valid_formats = ["csv", "pdf", "pdfsummary", "xlsx", "cyclonedx-vex", "cyclonedx-sbom-vex"]
 
     if not report_token:
         raise Exception("report_token is required")
@@ -43,6 +51,10 @@ def download_report(report_token, format=None, filter_results=False):
         "filtered": filter_results,
         "format": format,
     }
+
+    if format.lower() in {"cyclonedx-vex", "cyclonedx-sbom-vex"}:
+        data.update({"sbom_format": cyclonedx_format, "sbom_version": cyclonedx_version})
+
     result = timesys.llapi.GET(resource, data_dict=data, json=False)
 
     return result
