@@ -5,9 +5,7 @@ import timesys
 
 
 def get_cve_info(cve_id, fields=None):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get CVE info by CVE ID
+    """Get CVE info by CVE ID
 
     Parameters
     ----------
@@ -36,9 +34,7 @@ def get_cve_info(cve_id, fields=None):
 
 
 def search_cves_by_product(cpe_product, version="", ids_only=False):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get CVEs which affect given CPE Product and optionally filter by version
+    """Get CVEs which affect given CPE Product and optionally filter by version
 
     Parameters
     ----------

@@ -5,9 +5,7 @@ import timesys
 
 
 def download_report(report_token, format=None, filter_results=False, cyclonedx_format="json", cyclonedx_version="1.6"):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get a CVE report as a file from the given report token
+    """Get a CVE report as a file from the given report token
 
     Parameters
     ----------
@@ -61,9 +59,7 @@ def download_report(report_token, format=None, filter_results=False, cyclonedx_f
 
 
 def compare_reports(token_one, token_two, remove_whitelist=False, filter_results=False):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get comparison between report token_one and report token_two
+    """Get comparison between report token_one and report token_two
 
 
     Arguments

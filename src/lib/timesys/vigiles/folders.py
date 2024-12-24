@@ -5,9 +5,7 @@ import timesys
 
 
 def get_folders(group_token=None, folder_token=None):
-    """**Access to this route requires a Vigiles prime subscription..**
-
-    Get all folders that are owned by the current user.
+    """Get all folders that are owned by the current user.
 
     If a group token is configured on the llapi object, only folders belonging
     to that group will be returned.
@@ -36,9 +34,7 @@ def get_folders(group_token=None, folder_token=None):
 
 
 def create_folder(folder_name, description=None, group_token=None, folder_token=None):
-    """**Access to this route requires a Vigiles prime subscription..**
-
-    Create a new folder with given group/folder token
+    """Create a new folder with given group/folder token
 
     Returns
     -------

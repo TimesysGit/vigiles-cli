@@ -16,9 +16,7 @@ OTHERS = ['Android', 'Bitnami', 'CRAN', 'GIT', 'GSD', 'GitHub Actions', 'Go', 'H
 ALL_ECOSYSTEMS = OTHERS + ALMALINUX + ALPINE + DEBIAN + ROCKY + UBUNTU
 
 def get_manifests():
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get all manifests that are accessible by the current user
+    """Get all manifests that are accessible by the current user
 
     Group or folder tokens can be configured to limit results, but only one
     may be provided. If configured on the llapi object, folder token takes
@@ -57,9 +55,7 @@ def get_manifests():
 
 
 def get_manifest_info(manifest_token, sbom_format=None):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get manifest data along with metadata
+    """Get manifest data along with metadata
 
     Parameters
     ----------
@@ -102,9 +98,7 @@ def get_manifest_info(manifest_token, sbom_format=None):
 
 
 def get_manifest_file(manifest_token, sbom_format=None):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get manifest data as a file
+    """Get manifest data as a file
 
     Response does not include other metadata such as group/folder tokens.
 
@@ -258,9 +252,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
 
 
 def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, extra_fields=None):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Generate a new report for the given manifest_token
+    """Generate a new report for the given manifest_token
 
     Parameters
     ---------
@@ -319,9 +311,7 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
 
 
 def delete_manifest(manifest_token, confirmed=False):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Delete a manifest with the given token
+    """Delete a manifest with the given token
 
     This action can not be undone. It requires passing True for the
     'confirmed' keyword parameter to prevent accidental use.
@@ -353,9 +343,7 @@ def delete_manifest(manifest_token, confirmed=False):
 
 
 def get_report_tokens(manifest_token):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Get a list of report_tokens available for the given manifest_token
+    """Get a list of report_tokens available for the given manifest_token
 
     Parameters
     ----------
@@ -379,9 +367,7 @@ def get_report_tokens(manifest_token):
 
 
 def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Download the latest report for a manifest with the given token.
+    """Download the latest report for a manifest with the given token.
 
     Parameters
     ----------
@@ -437,9 +423,7 @@ def get_latest_report(manifest_token, filter_results=False, extra_fields=None):
 
 
 def set_custom_score(manifest_token, product_name, cve_id, custom_score, product_version=None):
-    """**Access to this route requires a Vigiles prime subscription.**
-
-    Set cve custom score in manifest chain.
+    """Set cve custom score in manifest chain.
 
     Parameters
     ----------
