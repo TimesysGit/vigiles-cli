@@ -304,6 +304,11 @@ if __name__ == '__main__':
     else:
         dash_config_path = None
 
+    # Display vigiles cli version with or without linuxlink key file
+    if parsed_args.command == 'version':
+        print(llapi.version)
+        sys.exit(0)
+
     # Configure LLAPI object
     llapi.configure(
         key_file_path=key_file_path,
@@ -312,13 +317,9 @@ if __name__ == '__main__':
         url=parsed_args.url,
         dry_run=parsed_args.dry_run,
     )
-
     # Call the corresponding API method for the given command line args
     try:
-        if parsed_args.command == 'version':
-            print(llapi.version)
-            sys.exit(0)
-        elif parsed_args.command in ['heartbeat', 'test']:
+        if parsed_args.command in ['heartbeat', 'test']:
             result = utilities.heartbeat()
         elif parsed_args.command == "manifest":
             manifest_command = parsed_args.manifest_command
