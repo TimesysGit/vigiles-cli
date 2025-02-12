@@ -131,6 +131,7 @@ def process_args(argv=None):
     parser_upload_manifest.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to resulting report (only config filters applied if omitted)')
     parser_upload_manifest.add_argument('-e', '--extra-fields', dest='extra_fields', help='Comma separated list of extra CVE attributes to include if results are returned. Acceptable values are: "assigner", "description", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
     parser_upload_manifest.add_argument('-E', '--ecosystems', dest='ecosystems', help='Comma separated string of ecosystems that should be used for generating reports')
+    parser_upload_manifest.add_argument('-S', '--subscribe', dest='subscribe', help='Manifest notification frequency.  Acceptable values are: "none", "daily", "weekly", "monthly".  Default is "none".')
 
     # manifest delete
     parser_manifest_delete = subparser_manifest.add_parser("delete", help="Delete a manifest with a given token. This can NOT be undone!")
@@ -351,7 +352,8 @@ if __name__ == '__main__':
                     filter_results=parsed_args.filter_results,
                     extra_fields=parsed_args.extra_fields,
                     upload_only=parsed_args.upload_only,
-                    ecosystems=parsed_args.ecosystems
+                    ecosystems=parsed_args.ecosystems,
+                    subscribe=parsed_args.subscribe
                 )
             elif manifest_command == "list":
                 result = vigiles.manifests.get_manifests()

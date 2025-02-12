@@ -127,7 +127,7 @@ def get_manifest_file(manifest_token, sbom_format=None):
     return timesys.llapi.GET(resource, data_dict=data, json=False)
 
 
-def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False, ecosystems=None):
+def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False, ecosystems=None, subscribe=None):
     """Upload and scan (optionally) a manifest
 
     If a group_token is configured on the llapi object, it will be used as the upload location.
@@ -166,6 +166,9 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         Default: False
     ecosystems : list of ecosystems, optional
         If provided, the input ecosystems will be used to generate reports
+    subscribe : str, optional
+        If provided, the user will be subscribed to the notifications at the given frequency
+        One of "none", "daily", "weekly", or "monthly"
 
     Returns
     -------
@@ -235,6 +238,9 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
                 logger.warning('Skipping invalid ecosystems: %s. Refer to README.md for valid ecosystems.' % ",".join(invalid_ecosystems))
             ecosystems = [item for item in ecosystems if item not in invalid_ecosystems]
         data["ecosystems"] = ",".join(ecosystems)
+
+    if subscribe is not None:
+        data["subscribe"] = subscribe
 
     group_token = timesys.llapi.group_token
     folder_token = timesys.llapi.folder_token
