@@ -276,6 +276,19 @@ def process_args(argv=None):
     parser_cve_info.add_argument('cve_id', help="CVE ID to return info for")
     parser_cve_info.add_argument('-f', '--fields', dest='fields', help='Optionally limit CVE attributes returned to this comma separated list. Acceptable values are: "affected_configurations", "assigner", "description", "identifier", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
 
+    # vuln status
+    parser_set_vuln_status = subparser_cves.add_parser("set_status", help="Set the status of a vulnerability")
+    parser_set_vuln_status.add_argument('scope', help='scope to apply status to', choices=['manifest', 'group', 'all'])
+    parser_set_vuln_status.add_argument('cve_id', help="CVE ID to set the status for")
+    parser_set_vuln_status.add_argument('package', help="package name to get CVEs for")
+    parser_set_vuln_status.add_argument('status', help="New status to set", choices=['resolved', 'resolved_with_pedigree', 'exploitable', 'in_triage', 'false_positive', 'not_affected'])
+    parser_set_vuln_status.add_argument('-j', '--justification', help="Justification for the status", choices=['code_not_present', 'code_not_reachable', 'requires_configuration', 'requires_dependency', 'requires_environment', 'protected_by_compiler', 'protected_at_runtime', 'protected_at_perimeter', 'protected_by_mitigating_control'])
+    parser_set_vuln_status.add_argument('-d', '--detail', dest='justification_detail', default='', help="Additional information for the status justification")
+    parser_set_vuln_status.add_argument('-v', '--version', dest='version', default='', help="Version of package to set status for")
+    parser_set_vuln_status.add_argument('-g', '--groups', dest='group_tokens', nargs='*', help='One or more group tokens to apply vuln status to. Should only be used when scope is group')
+    parser_set_vuln_status.add_argument('-m', '--manifests', dest='manifest_tokens', nargs='*', help='One or more manifest tokens to apply vuln status to. Should only be used when scope is manifest')
+
+
     # Return parsed commands
     parsed_args = parser.parse_args()
     if not parsed_args.command:
@@ -505,6 +518,18 @@ if __name__ == '__main__':
                 result = vigiles.cves.get_cve_info(
                     parsed_args.cve_id,
                     fields=parsed_args.fields,
+                )
+            elif cves_command == "set_status":
+                result = vigiles.cves.set_status(
+                    parsed_args.scope,
+                    parsed_args.cve_id,
+                    parsed_args.package,
+                    parsed_args.status,
+                    parsed_args.justification,
+                    parsed_args.justification_detail,
+                    parsed_args.version,
+                    parsed_args.manifest_tokens,
+                    parsed_args.group_tokens,
                 )
         else:
             raise Exception(f'Unhandled command: {parsed_args.command}')

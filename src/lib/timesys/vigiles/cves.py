@@ -62,3 +62,40 @@ def search_cves_by_product(cpe_product, version="", ids_only=False):
         "ids_only": ids_only,
     }
     return timesys.llapi.GET(resource, data_dict=data)
+
+
+def set_status(scope, cve_id, package_name, status, justification=None, justification_detail=None, package_version=None, manifest_tokens=None, group_tokens=None):
+
+    if not cve_id:
+        raise Exception("cve_id is required")
+    if not package_name:
+        raise Exception("package_name is required")
+    if not status:
+        raise Exception("status is required")
+
+    if scope == "group" and not group_tokens and timesys.llapi.group_token:
+        group_tokens = [timesys.llapi.group_token]
+
+    resource = f"/api/v1/vigiles/cves/{cve_id}/vuln-status"
+    data = {
+        "scope": scope,
+        "package": package_name,
+        "status": status,
+    }
+
+    if justification:
+        data["justification"] = justification
+
+    if package_version:
+        data["package_version"] = package_version
+
+    if justification_detail:
+        data["justification_detail"] = justification_detail
+
+    if manifest_tokens:
+        data["manifest_tokens"] = manifest_tokens
+
+    if group_tokens:
+        data["group_tokens"] = group_tokens
+
+    return timesys.llapi.POST(resource, data_dict=data)
