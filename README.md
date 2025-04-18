@@ -132,6 +132,35 @@ Verify authentication and server availability:
 If the heartbeat is ok, you are ready to use any of the toolkit's
 modules!
 
+
+#### Group settings
+
+To view current group settings use `info` command
+
+```
+$ vigiles -k path/to/linuxlink_key -d path/to/dashboard-config group settings info
+```
+
+Vigiles allows users to customize how vulnerabilities are matched in CVE scans by selecting specific identifiers.
+You can configure one or more of the following identifiers using group settings `update` command:
+- CPE
+- PURL
+- CVE Product
+- Package Name
+
+```
+$ vigiles -k path/to/linuxlink_key -d path/to/dashboard-config group settings update -i PURL CPE 'CVE Product'
+```
+**Note:** If selected identifiers are not found in the SBOM, the `Package Name` will be used as the default identifier.
+
+You can also set vuln-strict-match to "on" or "off" to enable or disable strict vendor matching.
+When enabled, this option matches vulnerabilities against the product vendor together with the vulnerability identifier.
+
+```
+$ vigiles -k path/to/linuxlink_key -d path/to/dashboard-config group settings update -s on
+```
+
+
 ## Generate Documentation
 
 If you want to generate documents:

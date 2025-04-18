@@ -290,3 +290,82 @@ def remove_group_member(group_token, member_email):
     resource = f"/api/v1/vigiles/groups/{group_token}/members/{member_email}"
 
     return timesys.llapi.DELETE(resource)
+
+
+def get_group_settings(group_token=None):
+    """Get group settings for a group
+
+    If a token is passed, it will be used.
+    If no token is passed, but a group_token is configured on the llapi object, it will be used.
+    If neither are provided, an Exception will be raised.
+
+    Parameters
+    ----------
+    group_token : str, optional
+        Token of the group to retrieve group settings info for
+
+    Returns
+    -------
+    dict
+        name : str
+            Group name
+        token : str
+            Group token
+        "vuln_identifiers": List
+            List of identifiers used to match the vulnerabilities
+        "vuln_strict_match": str
+            "on" if strict vulnerability based on name and vendor is enabled else "off"
+    """
+
+    if group_token is None:
+        group_token = timesys.llapi.group_token
+
+    if not group_token:
+        raise Exception('group_token is required either as a parameter or configured on the llapi object')
+
+    resource = f"/api/v1/vigiles/groups/{group_token}/settings"
+    
+    return timesys.llapi.GET(resource)
+
+
+def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_match=None):
+    """Update group settings for a group
+
+    If a token is passed, it will be used.
+    If no token is passed, but a group_token is configured on the llapi object, it will be used.
+    If neither are provided, an Exception will be raised.
+
+    Parameters
+    ----------
+    group_token : str, optional
+        Token of the group to retrieve group settings info for
+    vuln_identifiers: List, Optional
+        List of identifiers used to match the vulnerabilities
+    vuln_strict_match: str, Optional
+        "on" if strict vulnerability based on name and vendor is enabled else "off"
+
+    Returns
+    -------
+    dict
+        message: str
+            Success message on successfuly updating the group settings
+        status_code: int
+            Status code
+    """
+
+    if group_token is None:
+        group_token = timesys.llapi.group_token
+
+    if not group_token:
+        raise Exception('group_token is required either as a parameter or configured on the llapi object')
+
+    resource = f"/api/v1/vigiles/groups/{group_token}/settings"
+    
+    payload = {}
+
+    if vuln_identifiers is not None:
+        payload["vuln_identifiers"] = vuln_identifiers
+    if vuln_strict_match is not None:
+        payload["vuln_strict_match"] = vuln_strict_match
+    
+    return timesys.llapi.PATCH(resource, data_dict=payload)

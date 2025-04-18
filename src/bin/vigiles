@@ -233,6 +233,21 @@ def process_args(argv=None):
     parser_group_info.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
     parser_group_info.add_argument('-s', '--subgroups', action='store_true', default=False, dest='subgroups', help='Optional parameter to include subgroup details')
 
+    # Commands - group settings
+    # ========================
+    parser_group_settings = subparser_group.add_parser("settings", help="Get details about the group settings")
+    subparser_group_settings = parser_group_settings.add_subparsers(dest="settings_command", help='Which group settings command to execute', required=True)
+
+    # view group settings
+    parser_group_settings_info = subparser_group_settings.add_parser("info", help="View group settings")
+    parser_group_settings_info.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
+    
+    # update group settings
+    parser_group_settings_update = subparser_group_settings.add_parser("update", help="Update group settings")
+    parser_group_settings_update.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
+    parser_group_settings_update.add_argument('-i', '--vuln-identifiers', dest='vuln_identifiers', nargs='+', choices=["PURL", "CPE", "CVE Product", "Package Name"])
+    parser_group_settings_update.add_argument('-s', '--vuln-strict-match', dest='vuln_strict_match', choices=["on", "off"])
+
     # Commands - group members
     # ========================
     parser_members = subparser_group.add_parser("members", help="Get a list of all members in a group")
@@ -506,6 +521,19 @@ if __name__ == '__main__':
                         group_token=parsed_args.group_token,
                         member_email=parsed_args.member_email
                     )
+            elif group_command == "settings":
+                settings_command = parsed_args.settings_command
+                if settings_command == "update":
+                    result = vigiles.groups.update_group_settings(
+                        group_token=parsed_args.group_token,
+                        vuln_identifiers=parsed_args.vuln_identifiers,
+                        vuln_strict_match=parsed_args.vuln_strict_match
+                    )
+                elif settings_command == "info":
+                    result = vigiles.groups.get_group_settings(
+                        group_token=parsed_args.group_token,
+                    )
+
         elif parsed_args.command == "cves":
             cves_command = parsed_args.cves_command
             if cves_command == "search":
