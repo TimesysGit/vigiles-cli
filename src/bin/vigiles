@@ -192,8 +192,9 @@ def process_args(argv=None):
     parser_report_compare = subparser_reports.add_parser("compare", help="Compare two CVE reports with given tokens")
     parser_report_compare.add_argument('token_one', help='Token of the first report')
     parser_report_compare.add_argument('token_two', help='Token of the report to compare to the first report')
-    parser_report_compare.add_argument('-r', '--remove_whitelist', action='store_true', dest='remove_whitelist', help='Remove whitelisted CVEs from the comparison')
+    parser_report_compare.add_argument('-r', '--remove_whitelist', action='store_true', dest='remove_whitelist', help='remove_whitelist is deprecated, use remove_not_affected instead')
     parser_report_compare.add_argument('-f', '--filter_results', action='store_true', default=False, dest='filter_results', help='Apply all filters to reports (only config filters applied if omitted)')
+    parser_report_compare.add_argument('-n', '--remove_not_affected', action='store_true', default=False, dest='remove_not_affected', help='Remove Not Affected CVEs from the comparison')
 
     # Commands - Folder
     # =================
@@ -474,6 +475,7 @@ if __name__ == '__main__':
                     parsed_args.token_two,
                     filter_results=parsed_args.filter_results,
                     remove_whitelist=parsed_args.remove_whitelist,
+                    remove_not_affected=parsed_args.remove_not_affected,
                 )
         elif parsed_args.command == "folder":
             folder_command = parsed_args.folder_command

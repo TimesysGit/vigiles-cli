@@ -58,7 +58,7 @@ def download_report(report_token, format=None, filter_results=False, cyclonedx_f
     return result
 
 
-def compare_reports(token_one, token_two, remove_whitelist=False, filter_results=False):
+def compare_reports(token_one, token_two, remove_whitelist=False, remove_not_affected=False, filter_results=False):
     """Get comparison between report token_one and report token_two
 
 
@@ -69,7 +69,10 @@ def compare_reports(token_one, token_two, remove_whitelist=False, filter_results
     token_two : str
         Token of the second CVE report
     remove_whitelist : bool
-        Remove whitelisted CVEs from the report if True
+        remove_whitelist is deprecated, use remove_not_affected instead
+        Default: False
+    remove_not_affected : bool
+        Remove Not Affected CVEs from the report if True
         Default: False
     filter_results : bool
         Apply all filters to report if True, else only kernel and uboot config filters if configs have been uploaded.
@@ -93,6 +96,7 @@ def compare_reports(token_one, token_two, remove_whitelist=False, filter_results
         "token_one": token_one,
         "token_two": token_two,
         "remove_whitelist": remove_whitelist,
+        "remove_not_affected": remove_not_affected,
         "filtered": filter_results,
     }
     return timesys.llapi.GET(resource, data)
