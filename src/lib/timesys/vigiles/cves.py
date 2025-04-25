@@ -15,7 +15,7 @@ def get_cve_info(cve_id, fields=None):
         Limit cve data returned to given the fields. If none are specified, all are returned.
 
         Valid fields:
-            "affected_configurations", "assigner", "description", "identifier", "impact", "modified", "problem_types", "published", "references"
+            "affected_configurations", "assigner", "description", "identifier", "impact", "modified", "problem_types", "published", "references" , "nvd_status", "cisa", "epss"
 
     Returns
     -------
