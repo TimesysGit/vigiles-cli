@@ -54,7 +54,7 @@ def get_manifests():
     return timesys.llapi.GET(resource, data_dict=data)
 
 
-def get_manifest_info(manifest_token, sbom_format=None):
+def get_manifest_info(manifest_token, sbom_format=None, file_format=None, sbom_version=None):
     """Get manifest data along with metadata
 
     Parameters
@@ -64,7 +64,17 @@ def get_manifest_info(manifest_token, sbom_format=None):
 
         Acceptable formats are:
             "spdx"
-                Convert the manifest to SPDX format before returning it
+                Convert the manifest to SPDX format
+            "spdx-lite"
+                Convert the manifest to a SPDX tag-value format
+            "cyclonedx"
+                Convert the manifest to CycloneDX JSON format
+
+    file_format : str, optional
+        Specify file format type for SPDX and CycloneDX SBOMs
+
+    sbom_version : str, optional
+        Specify SBOM version for SPDX and CycloneDX SBOMs
 
     Returns
     -------
@@ -83,21 +93,25 @@ def get_manifest_info(manifest_token, sbom_format=None):
             manifest_data
                 Contents of the manifest
                 By default this is the same format as it was uploaded, unless
-                converted due to the "sbom_format" parameter
+                converted using the "sbom_format" parameter
     """
 
     if not manifest_token:
         raise Exception("manifest_token is required")
 
     data = {}
-    if sbom_format is not None:
+    if sbom_format:
         data["sbom_format"] = sbom_format
+    if file_format:
+        data["file_format"] = file_format
+    if sbom_version:
+        data["sbom_version"] = sbom_version
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}"
     return timesys.llapi.GET(resource, data_dict=data)
 
 
-def get_manifest_file(manifest_token, sbom_format=None):
+def get_manifest_file(manifest_token, sbom_format=None, file_format=None, sbom_version=None):
     """Get manifest data as a file
 
     Response does not include other metadata such as group/folder tokens.
@@ -105,11 +119,21 @@ def get_manifest_file(manifest_token, sbom_format=None):
     Parameters
     ----------
     sbom_format : str, optional
-        If specified, the server will convert the manifest data to the specified format.
+        If specified, the server will convert the manifest data to this format.
 
         Acceptable formats are:
             "spdx"
-                Convert the manifest to SPDX format before returning it
+                Convert the manifest to SPDX format
+            "spdx-lite"
+                Convert the manifest to a SPDX tag-value format
+            "cyclonedx"
+                Convert the manifest to CycloneDX JSON format
+
+    file_format : str, optional
+        Specify file format type for SPDX and CycloneDX SBOMs
+
+    sbom_version : str, optional
+        Specify SBOM version for SPDX and CycloneDX SBOMs
 
     Returns
     -------
@@ -124,6 +148,10 @@ def get_manifest_file(manifest_token, sbom_format=None):
     data = {'send_file': True}
     if sbom_format:
         data["sbom_format"] = sbom_format
+    if file_format:
+        data["file_format"] = file_format
+    if sbom_version:
+        data["sbom_version"] = sbom_version
     return timesys.llapi.GET(resource, data_dict=data, json=False)
 
 
