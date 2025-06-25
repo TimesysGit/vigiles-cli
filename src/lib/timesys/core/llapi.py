@@ -39,7 +39,7 @@ class LLAPI:
         Once configured, operations which can be limited to certain Products
         or Folders will use these values.
     url : str, optional
-        The base URL for API communication. Default is https://linuxlink.timesys.com
+        The base URL for API communication. Default is https://vigiles.lynx.com
     verify_cert : bool or str
         If False, insecure requests are enabled. Certificates will not be verified.
         May be set to a string containing the path to a CA_BUNDLE.
@@ -52,6 +52,7 @@ class LLAPI:
         Specify the package's default log level.
         Default is "WARNING"
     """
+    DEFAULT_SERVER = "https://vigiles.lynx.com"
 
     logger = logging.getLogger(__name__).getChild(__qualname__)
 
@@ -65,11 +66,14 @@ class LLAPI:
 
         try:
             email = key_info["email"].strip()
-            key = key_info["key"].strip().encode('utf-8')
+            key = key_info.get("organization_key", key_info.get("key", "")).strip().encode('utf-8')
+            url = key_info.get("server_url", LLAPI.DEFAULT_SERVER).strip()
+            if url.endswith("/"):
+                url = url[:-1]
         except Exception as e:
             raise Exception("Invalid or missing data in key file") from None
 
-        return (email, key)
+        return (email, key, url)
 
     @staticmethod
     def parse_dashboard_config(dashboard_config_path):
@@ -94,7 +98,7 @@ class LLAPI:
             "folder_token": folder,
         }
 
-    def __init__(self, key_file_path=None, dashboard_config_path=None, url='https://linuxlink.timesys.com', verify_cert=True, dry_run=False, log_level='WARNING'):
+    def __init__(self, key_file_path=None, dashboard_config_path=None, url=None, verify_cert=True, dry_run=False, log_level='WARNING'):
         self.log_level = log_level
         self.email = None
         self.key = None
@@ -244,7 +248,7 @@ class LLAPI:
 
     def configure(self, key_file_path=None, dashboard_config_path=None, url=None, verify_cert=None, dry_run=None, log_level=None):
         if key_file_path:
-            self.email, self.key = self.parse_keyfile(key_file_path)
+            self.email, self.key, self.url = self.parse_keyfile(key_file_path)
 
         if dashboard_config_path:
             dashboard_config = self.parse_dashboard_config(dashboard_config_path)
