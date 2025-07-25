@@ -228,7 +228,7 @@ class LLAPI:
                 e = r.json()    # errors should be JSON responses too,
             except ValueError:  # but just incase HTML comes back..
                 e = r.status_code
-            raise Exception(f"LinuxLink server returned an error: {e}") from None
+            raise Exception(f"Vigiles server returned an error: {e}") from None
         except requests.exceptions.ConnectionError as e:
             raise Exception(f"Connection could not be made: {e}") from None
         except requests.exceptions.Timeout:
