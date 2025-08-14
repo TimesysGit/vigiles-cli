@@ -4,6 +4,8 @@
 import logging
 import timesys
 
+from typing import List, Optional
+
 logger = logging.getLogger(__name__)
 
 ALMALINUX = ['AlmaLinux', 'AlmaLinux:8', 'AlmaLinux:9']
@@ -496,4 +498,76 @@ def set_custom_score(manifest_token, product_name, cve_id, custom_score, product
         data['package_version'] = product_version
 
     resource = f"/api/v1/vigiles/manifests/{manifest_token}/custom_scores"
+    return timesys.llapi.POST(resource, data_dict=data)
+
+
+def bulk_move_manifests(
+    sbom_tokens: List[str], 
+    target_group_token: Optional[str] = None, 
+    target_folder_token: Optional[str] = None, 
+    include_history: bool = False
+):
+    """Move multiple SBOMs to a group/folder
+
+    Parameters
+    ----------
+    sbom_tokens : List[str]
+        List of SBOM tokens to move
+    target_group_token : str, optional
+        Target group token to which the sboms are to be moved, by default None
+    target_folder_token : str, optional
+        Target folder token to which the sboms are to be moved, by default None
+    include_history : bool, optional
+        Include previous versions of the SBOM, by default False
+    """
+    if not any([target_group_token, target_folder_token]):
+        raise Exception("Please specify either a target group or target folder token")
+    
+    data = {
+        "sbom_tokens": sbom_tokens,
+        "copy": False,
+        "include_history": include_history
+    }
+    
+    if target_folder_token:
+        data['target_folder_token'] = target_folder_token
+    if target_group_token:
+        data['target_group_token'] = target_group_token
+    resource = "/api/v1/vigiles/manifests/bulk-options/move"
+    return timesys.llapi.POST(resource, data_dict=data)
+
+
+def bulk_copy_manifests(
+    sbom_tokens: List[str], 
+    target_group_token: Optional[str] = None, 
+    target_folder_token: Optional[str] = None, 
+    include_history: bool = False
+):
+    """Copy multiple SBOMs to a group/folder
+
+    Parameters
+    ----------
+    sbom_tokens : List[str]
+        List of SBOM tokens to copy
+    target_group_token : str, optional
+        Target group token to which the sboms are to be copied, by default None
+    target_folder_token : str, optional
+        Target folder token to which the sboms are to be copied, by default None
+    include_history : bool, optional
+        Include previous versions of the SBOM, by default False
+    """
+    if not any([target_group_token, target_folder_token]):
+        raise Exception("Please specify either a target group or target folder token")
+    
+    data = {
+        "sbom_tokens": sbom_tokens,
+        "copy": True,
+        "include_history": include_history
+    }
+    
+    if target_folder_token:
+        data['target_folder_token'] = target_folder_token
+    if target_group_token:
+        data['target_group_token'] = target_group_token
+    resource = "/api/v1/vigiles/manifests/bulk-options/move"
     return timesys.llapi.POST(resource, data_dict=data)

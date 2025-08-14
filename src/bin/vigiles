@@ -155,6 +155,23 @@ def process_args(argv=None):
     parser_manifest_latest.add_argument('-e', '--extra-fields', dest='extra_fields', help='Comma separated list of extra CVE attributes to include if results are returned. Acceptable values are: "assigner", "description", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
     parser_manifest_latest.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to report (only config filters applied if omitted)')
 
+    # manifest bulk-options
+    ## Move
+    parser_manifest_move = subparser_manifest.add_parser("move", help="Move one or more SBOMs to a target group/folder")
+    parser_manifest_move.add_argument('manifest_tokens', nargs='+', metavar="manifest-tokens", help="Tokens for the SBOMs to be moved")
+    parser_manifest_move_exclusive_token = parser_manifest_move.add_mutually_exclusive_group(required=True)
+    parser_manifest_move_exclusive_token.add_argument('-g', '--group-token', dest='target_group_token', help='Token of the target group to move the SBOMs into')
+    parser_manifest_move_exclusive_token.add_argument('-f', '--folder-token', dest='target_folder_token', help='Token of the target folder to move the SBOMs into')
+    parser_manifest_move.add_argument('-i', '--include-history', action='store_true', default=False, dest='include_history', help='Include previous versions of the SBOM')
+
+    ## Copy
+    parser_manifest_copy = subparser_manifest.add_parser("copy", help="Copy one or more SBOMs to a target group/folder")
+    parser_manifest_copy.add_argument('manifest_tokens', nargs='+', metavar="manifest-tokens", help="Tokens for the SBOMs to be copied")
+    parser_manifest_copy_exclusive_token = parser_manifest_copy.add_mutually_exclusive_group(required=True)
+    parser_manifest_copy_exclusive_token.add_argument('-g', '--group-token', dest='target_group_token', help='Token of the target group to copy the SBOMs into')
+    parser_manifest_copy_exclusive_token.add_argument('-f', '--folder-token', dest='target_folder_token', help='Token of the target folder to copy the SBOMs into')
+    parser_manifest_copy.add_argument('-i', '--include-history', action='store_true', default=False, dest='include_history', help='Include previous versions of the SBOM')
+
     # Commands - Manifest Chain Custom Score
     # ==================
     parser_custom_score = subparser_manifest.add_parser("custom-score", help="Commands related to the custom score of linked manifests")
@@ -446,6 +463,20 @@ if __name__ == '__main__':
                         parsed_args.score,
                         product_version=parsed_args.version,
                     )
+            elif manifest_command == "move":
+                result = vigiles.manifests.bulk_move_manifests(
+                    parsed_args.manifest_tokens, 
+                    parsed_args.target_group_token, 
+                    parsed_args.target_folder_token,
+                    parsed_args.include_history
+                )
+            elif manifest_command == "copy":
+                result = vigiles.manifests.bulk_copy_manifests(
+                    parsed_args.manifest_tokens, 
+                    parsed_args.target_group_token, 
+                    parsed_args.target_folder_token,
+                    parsed_args.include_history
+                )
             else:
                 raise Exception(f'Unhandled manifest command: {parsed_args.manifest_command}')
         elif parsed_args.command == "report":
