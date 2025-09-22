@@ -308,6 +308,20 @@ def process_args(argv=None):
     parser_group_remove_member.add_argument('group_token', metavar="group_token", help="Token for the group")
     parser_group_remove_member.add_argument('-e', '--member-email', help="Group member email to be removed", required=True)
 
+    # activity log
+    parser_group_activity_log = subparser_group.add_parser("activity_log", help="Get activity log entries for group")
+    parser_group_activity_log.add_argument('group_token', metavar="group_token")
+    parser_group_activity_log.add_argument('-f', '--folder-token', dest="folder_token")
+    parser_group_activity_log.add_argument('-s', '--manifest-token', dest="manifest_token")
+    parser_group_activity_log.add_argument('-r', '--report-token', dest="report_token")
+    parser_group_activity_log.add_argument('-u', '--user-email', dest="user_email")
+    parser_group_activity_log.add_argument('-p', '--package-name', dest="package_name")
+    parser_group_activity_log.add_argument('-v', '--package-version', dest="package_version")
+    parser_group_activity_log.add_argument('-i', '--vuln-id', dest="vuln_id")
+    parser_group_activity_log.add_argument('-t', '--log-type', dest='log_type', choices=["create_note", "delete_note", "import_note", "update_vuln_status", "import_vuln_status", "update_custom_score", "import_custom_score", "create_jira_issue", "delete_jira_issue"])
+    parser_group_activity_log.add_argument('-m', '--log-method', dest='log_method', choices=["ui", "api"])
+
+
     # Commands - CVEs
     # ===============
     parser_cves = subparsers.add_parser("cves", help="Commands related to CVEs")
@@ -594,6 +608,19 @@ if __name__ == '__main__':
             elif group_command == "unarchive":
                 result = vigiles.groups.bulk_unarchive_groups(
                     tokens=parsed_args.group_tokens,
+                )
+            elif group_command == "activity_log":
+                result = vigiles.groups.search_activity_log(
+                    group_token=parsed_args.group_token,
+                    log_type=parsed_args.log_type,
+                    log_method=parsed_args.log_method,
+                    folder_token=parsed_args.folder_token,
+                    manifest_token=parsed_args.manifest_token,
+                    report_token=parsed_args.report_token,
+                    user_email=parsed_args.user_email,
+                    package_name=parsed_args.package_name,
+                    package_version=parsed_args.package_version,
+                    vuln_id=parsed_args.vuln_id,
                 )
 
         elif parsed_args.command == "cves":
