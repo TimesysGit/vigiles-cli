@@ -422,3 +422,40 @@ def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_m
         payload["vuln_strict_match"] = vuln_strict_match
 
     return timesys.llapi.PATCH(resource, data_dict=payload)
+
+
+def search_activity_log(group_token=None, folder_token=None, manifest_token=None, report_token=None, user_email=None, package_name=None, package_version=None, vuln_id=None, log_type=None, log_method=None):
+    group_token = group_token or timesys.llapi.group_token
+    folder_token = folder_token or timesys.llapi.folder_token
+
+    if not group_token:
+        raise Exception('group_token is required either as a parameter or configured on the llapi object')
+
+    resource = f"/api/v1/vigiles/groups/{group_token}/activity_log"
+
+    data = {
+        "group_token": group_token
+    }
+
+    if log_type:
+        data["log_type"] = log_type
+    if log_method:
+        data["log_method"] = log_method
+
+    if folder_token:
+        data["folder_token"] = folder_token
+    if manifest_token:
+        data["manifest_token"] = manifest_token
+    if report_token:
+        data["report_token"] = report_token
+    if user_email:
+        data["user_email"] = user_email
+
+    if package_name:
+        data["package_name"] = package_name
+    if package_version:
+        data["package_version"] = package_version
+    if vuln_id:
+        data["vuln_id"] = vuln_id
+
+    return timesys.llapi.GET(resource, data_dict=data)
