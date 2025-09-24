@@ -237,8 +237,11 @@ def process_args(argv=None):
     parser_group = subparsers.add_parser("group", help="Commands related to groups and group tokens")
     subparser_group = parser_group.add_subparsers(dest="group_command", help='Which group command to execute', required=True)
 
-    # group list
-    subparser_group.add_parser("list", help="Get a list of tokens for all of the groups available to a user")
+    # group list_active
+    subparser_group.add_parser("list_active", help="Get a list of tokens for all active (not archived) groups available to a user")
+
+    # group list_archived
+    subparser_group.add_parser("list_archived", help="Get a list of tokens for all archived groups available to a user")
 
     # group create
     parser_group_create = subparser_group.add_parser("create", help="Create a new group")
@@ -255,6 +258,14 @@ def process_args(argv=None):
     parser_group_info.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
     parser_group_info.add_argument('-s', '--subgroups', action='store_true', default=False, dest='subgroups', help='Optional parameter to include subgroup details')
 
+    # group bulk-options
+    ## Archive
+    parser_group_archive = subparser_group.add_parser("archive", help="Archive one or more groups")
+    parser_group_archive.add_argument('group_tokens', nargs='+', metavar='group-tokens', help='Token(s) for groups to be archived. Separated by space')
+
+    parser_group_archive = subparser_group.add_parser("unarchive", help="Unarchive one or more groups")
+    parser_group_archive.add_argument('group_tokens', nargs='+', metavar='group-tokens', help='Token(s) for groups to be unarchived. Separated by space')
+
     # Commands - group settings
     # ========================
     parser_group_settings = subparser_group.add_parser("settings", help="Get details about the group settings")
@@ -263,7 +274,7 @@ def process_args(argv=None):
     # view group settings
     parser_group_settings_info = subparser_group_settings.add_parser("info", help="View group settings")
     parser_group_settings_info.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
-    
+
     # update group settings
     parser_group_settings_update = subparser_group_settings.add_parser("update", help="Update group settings")
     parser_group_settings_update.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
@@ -274,7 +285,7 @@ def process_args(argv=None):
     # ========================
     parser_members = subparser_group.add_parser("members", help="Get a list of all members in a group")
     subparser_members = parser_members.add_subparsers(dest="member_command", help='Which group member command to execute', required=True)
-    
+
     # list group members
     parser_group_members_list = subparser_members.add_parser("list", help="Get a list of all members in a group")
     parser_group_members_list.add_argument('group_token', metavar="group_token", help="Token of the group to get its members")
@@ -465,15 +476,15 @@ if __name__ == '__main__':
                     )
             elif manifest_command == "move":
                 result = vigiles.manifests.bulk_move_manifests(
-                    parsed_args.manifest_tokens, 
-                    parsed_args.target_group_token, 
+                    parsed_args.manifest_tokens,
+                    parsed_args.target_group_token,
                     parsed_args.target_folder_token,
                     parsed_args.include_history
                 )
             elif manifest_command == "copy":
                 result = vigiles.manifests.bulk_copy_manifests(
-                    parsed_args.manifest_tokens, 
-                    parsed_args.target_group_token, 
+                    parsed_args.manifest_tokens,
+                    parsed_args.target_group_token,
                     parsed_args.target_folder_token,
                     parsed_args.include_history
                 )
@@ -531,8 +542,10 @@ if __name__ == '__main__':
                     group_description=parsed_args.description,
                     group_token=parsed_args.group_token,
                 )
-            elif group_command == "list":
+            elif group_command == "list_active":
                 result = vigiles.groups.get_groups()
+            elif group_command == "list_archived":
+                result = vigiles.groups.get_archived_groups()
             elif group_command == "info":
                 result = vigiles.groups.get_group_info(
                     group_token=parsed_args.group_token,
@@ -574,6 +587,14 @@ if __name__ == '__main__':
                     result = vigiles.groups.get_group_settings(
                         group_token=parsed_args.group_token,
                     )
+            elif group_command == "archive":
+                result = vigiles.groups.bulk_archive_groups(
+                    tokens=parsed_args.group_tokens,
+                )
+            elif group_command == "unarchive":
+                result = vigiles.groups.bulk_unarchive_groups(
+                    tokens=parsed_args.group_tokens,
+                )
 
         elif parsed_args.command == "cves":
             cves_command = parsed_args.cves_command

@@ -3,9 +3,10 @@
 
 import timesys
 
+from typing import List, Optional
 
 def get_groups():
-    """Get group info for all groups available to the current user
+    """Get group info for all active groups available to the current user
 
     Returns
     -------
@@ -23,6 +24,28 @@ def get_groups():
     """
 
     resource = "/api/v1/vigiles/groups"
+    return timesys.llapi.GET(resource)
+
+
+def get_archived_groups():
+    """Get group info for all archived groups available to the current user
+
+    Returns
+    -------
+    list of dict containing
+        name : str
+            Group name
+        description : str
+            Group description
+        token : str
+            Group token
+        group_type : str
+            Group type (Group or Subgroup)
+        organization_token : str
+            Parent organization token
+    """
+
+    resource = "/api/v1/vigiles/groups/archived"
     return timesys.llapi.GET(resource)
 
 
@@ -108,8 +131,38 @@ def get_group_info(group_token=None, subgroups=False):
 
     resource = f"/api/v1/vigiles/groups/{group_token}"
     data = {"subgroups": subgroups}
-    
+
     return timesys.llapi.GET(resource, data_dict=data)
+
+
+def bulk_archive_groups(tokens: List[str]):
+    """Mark multiple groups as archived
+
+    Parameters
+    ----------
+    tokens : List[str]
+        List of group tokens to mark as archived
+    """
+
+    data = {"tokens": tokens}
+
+    resource = "/api/v1/vigiles/groups/archive"
+    return timesys.llapi.PATCH(resource, data_dict=data)
+
+
+def bulk_unarchive_groups(tokens: List[str]):
+    """Mark multiple groups as unarchived
+
+    Parameters
+    ----------
+    tokens : List[str]
+        List of group tokens to mark as unarchived
+    """
+
+    data = {"tokens": tokens}
+
+    resource = "/api/v1/vigiles/groups/unarchive"
+    return timesys.llapi.PATCH(resource, data_dict=data)
 
 
 def delete_group(group_token):
@@ -135,7 +188,7 @@ def delete_group(group_token):
     """
     if not group_token:
         raise Exception('group_token is required')
-    
+
     resource = f"/api/v1/vigiles/groups/{group_token}"
 
     return timesys.llapi.DELETE(resource)
@@ -156,7 +209,7 @@ def get_group_members(group_token):
 
     Returns
     -------
-    dict      
+    dict
         group_name : str
             Name of the group
         description : str
@@ -170,7 +223,7 @@ def get_group_members(group_token):
     """
     if not group_token:
         raise Exception('group_token is required')
-    
+
     resource = f"/api/v1/vigiles/groups/{group_token}/members"
 
     return timesys.llapi.GET(resource)
@@ -209,7 +262,7 @@ def add_group_member(group_token, member_email, role, access_subgroups=False):
         raise Exception('member_email is required')
     if not role:
         raise Exception('role is required')
-        
+
     resource = f"/api/v1/vigiles/groups/{group_token}/members"
     payload = {
         "member_email": member_email,
@@ -251,7 +304,7 @@ def update_group_member(group_token, member_email, new_role):
         raise Exception('member_email is required')
     if not new_role:
         raise Exception('new_role is required')
-        
+
     resource = f"/api/v1/vigiles/groups/{group_token}/members/{member_email}"
     payload = {
         "new_role": new_role
@@ -286,7 +339,7 @@ def remove_group_member(group_token, member_email):
         raise Exception('group_token is required')
     if not member_email:
         raise Exception('member_email is required')
-    
+
     resource = f"/api/v1/vigiles/groups/{group_token}/members/{member_email}"
 
     return timesys.llapi.DELETE(resource)
@@ -324,7 +377,7 @@ def get_group_settings(group_token=None):
         raise Exception('group_token is required either as a parameter or configured on the llapi object')
 
     resource = f"/api/v1/vigiles/groups/{group_token}/settings"
-    
+
     return timesys.llapi.GET(resource)
 
 
@@ -360,12 +413,12 @@ def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_m
         raise Exception('group_token is required either as a parameter or configured on the llapi object')
 
     resource = f"/api/v1/vigiles/groups/{group_token}/settings"
-    
+
     payload = {}
 
     if vuln_identifiers is not None:
         payload["vuln_identifiers"] = vuln_identifiers
     if vuln_strict_match is not None:
         payload["vuln_strict_match"] = vuln_strict_match
-    
+
     return timesys.llapi.PATCH(resource, data_dict=payload)
