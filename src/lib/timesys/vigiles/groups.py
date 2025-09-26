@@ -425,6 +425,39 @@ def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_m
 
 
 def search_activity_log(group_token=None, folder_token=None, manifest_token=None, report_token=None, user_email=None, package_name=None, package_version=None, vuln_id=None, log_type=None, log_method=None):
+    """ Search the activity log
+
+    Parameters
+    ----------
+    group_token : str
+        Token of the group to search
+    folder_token: str, optional
+        Token of the folder to filter by
+    manifest_token: str, optional
+        Token of the SBOM to filter by
+    report_token: str, optional
+        Token of the report to filter by
+    user_email: str, optional
+        Email of the user to filter by
+    log_type: str, optional
+        Type of log to filter by. Acceptable values are:
+            "create_note", "delete_note", "import_note", "update_vuln_status", "import_vuln_status", "update_custom_score", "import_custom_score", "create_jira_issue", "delete_jira_issue"
+    log_method: str, optional
+        Method of log to filter by. Acceptable values are:
+            "api", "ui"
+    package_name: str, optional
+        Package name to filter by
+    package_version: str, optional
+        Package version to filter by
+    vuln_id: str, optional
+        Vulnerability ID to filter by
+
+    Returns
+    -------
+    results : ``array(object)``
+        Array of activity log objects with keys:
+        "date", "log_type", "method", "description", "group", "folder", "report", "manifest", "user", "vuln_id", "package", "package_version"
+    """
     group_token = group_token or timesys.llapi.group_token
     folder_token = folder_token or timesys.llapi.folder_token
 
