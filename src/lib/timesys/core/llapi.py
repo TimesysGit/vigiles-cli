@@ -7,6 +7,7 @@ import hmac
 import json
 import logging
 import requests
+import time
 import urllib.parse
 import urllib3
 import warnings
@@ -201,7 +202,7 @@ class LLAPI:
 
         return request
 
-    def _do_api_call(self, request_dict, json_response):
+    def _do_api_call(self, request_dict, json_response, max_retries=5, retry_timeout=5):
         if not self.configured:
             raise Exception('LLAPI object is not configured properly') from None
 
@@ -214,36 +215,56 @@ class LLAPI:
         except KeyError as e:
             raise Exception('_do_api_call: Missing required key: %s' % e.args[0]) from None
 
-        try:
-            # only filter the InsecureRequestWarning for our call, rather than globally
-            if self.verify_cert is False:
-                with warnings.catch_warnings():
-                    warnings.simplefilter('ignore', urllib3.exceptions.InsecureRequestWarning)
-                    r = requests.request(method, url, verify=False, **request_dict)
-            else:
-                r = requests.request(method, url, verify=self.verify_cert, **request_dict)
-            r.raise_for_status()
-        except requests.exceptions.HTTPError:
+        for attempt in range(max_retries):
+            retry = False
+            error_to_raise = None
+            retry_count = attempt + 1
             try:
-                e = r.json()    # errors should be JSON responses too,
-            except ValueError:  # but just incase HTML comes back..
-                e = r.status_code
-            raise Exception(f"Vigiles server returned an error: {e}") from None
-        except requests.exceptions.ConnectionError as e:
-            raise Exception(f"Connection could not be made: {e}") from None
-        except requests.exceptions.Timeout:
-            raise Exception("Connection attempt timed out") from None
-        except Exception:
-            raise
+                # only filter the InsecureRequestWarning for our call, rather than globally
+                if self.verify_cert is False:
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore', urllib3.exceptions.InsecureRequestWarning)
+                        r = requests.request(method, url, verify=False, **request_dict)
+                else:
+                    r = requests.request(method, url, verify=self.verify_cert, **request_dict)
+                r.raise_for_status()
+            except requests.exceptions.HTTPError:
+                try:
+                    e = r.json()    # errors should be JSON responses too,
+                except ValueError:  # but just incase HTML comes back..
+                    e = r.status_code
+                status_code = r.status_code
+                error_to_raise = Exception(f"Vigiles server returned an error: {e}")
+                # Only retry for errors with HTTP codes greater than 500, otherwise raise error
+                if status_code and status_code >= 500:
+                    retry = True
+                else:
+                    raise error_to_raise
+            except requests.exceptions.ConnectionError as e:
+                retry = True
+                error_to_raise = Exception(f"Connection could not be made: {e}")
+            except requests.exceptions.Timeout:
+                retry = True
+                error_to_raise = Exception("Connection attempt timed out")
+            except Exception:
+                raise
 
-        if not json_response:
-            return r.content  # bytes, which may be text or binary file content
-        else:
-            try:
-                json_data = r.json()
-            except Exception as e:
-                raise Exception(f"_do_api_call: error parsing JSON response: {e}") from None
-        return json_data
+            if error_to_raise and retry_count == max_retries:
+                raise error_to_raise from None
+
+            if retry and retry_count < max_retries:
+                print(f"({attempt + 1} of {max_retries}) Unable to connect to Vigiles Servers, retrying in {retry_timeout} seconds")
+                time.sleep(retry_timeout)
+                continue
+
+            if not json_response:
+                return r.content  # bytes, which may be text or binary file content
+            else:
+                try:
+                    json_data = r.json()
+                except Exception as e:
+                    raise Exception(f"_do_api_call: error parsing JSON response: {e}") from None
+            return json_data
 
     def configure(self, key_file_path=None, dashboard_config_path=None, url=None, verify_cert=None, dry_run=None, log_level=None):
         if key_file_path:
