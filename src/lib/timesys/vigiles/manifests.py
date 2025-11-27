@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 import logging
+import os
 import timesys
 
 from typing import List, Optional
+from timesys.core.utils import save_file
 
 logger = logging.getLogger(__name__)
 
@@ -157,7 +159,10 @@ def get_manifest_file(manifest_token, sbom_format=None, file_format=None, sbom_v
     return timesys.llapi.GET(resource, data_dict=data, json=False)
 
 
-def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False, ecosystems=None, subscribe=None):
+def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, 
+                    subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False, 
+                    ecosystems=None, subscribe=None, export_format=None, export_path=None,
+                    cyclonedx_format=None, cyclonedx_version=None):
     """Upload and scan (optionally) a manifest
 
     If a group_token is configured on the llapi object, it will be used as the upload location.
@@ -199,6 +204,19 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     subscribe : str, optional
         If provided, the user will be subscribed to the notifications at the given frequency
         One of "none", "daily", "weekly", or "monthly"
+    export_format: str, optional
+        If provided, a vulnerability report will be downloaded at the specified path
+        One of "pdf", "pdfsummary", "xlsx", "csv", "cyclonedx-vex", "cyclonedx-sbom-vex"
+    export_path: str, optional
+        If provided with export_format, will be used to save the vulnerability report
+    cyclonedx_format: str, optional
+        If export_format is selected as cyclonedx-vex or cyclonedx-sbom-vex, then this option is used to specify
+        the format of the cyclonedx vex report
+        One of "json", "xml"
+    cyclonedx_version: str, optional
+        If export_format is selected as cyclonedx-vex or cyclonedx-sbom-vex, then this option is used to specify
+        the version of the cyclonedx vex report
+        One of "1.4", "1.5", "1.6"
 
     Returns
     -------
@@ -284,7 +302,35 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     if not group_token and (folder_token or subfolder_name):
         logger.warning('"Private Workspace" does not support folders. Since a group token is not configured, the folder_token and subfolder_name arguments will be ignored.')
 
-    return timesys.llapi.POST(resource, data)
+    if export_format:
+        data["export_format"] = export_format
+
+    if cyclonedx_format:
+        data["cyclonedx_format"] = cyclonedx_format
+
+    if cyclonedx_version:
+        data["cyclonedx_version"] = cyclonedx_version
+
+    result = timesys.llapi.POST(resource, data)
+
+    exported_report_data = result.pop("exported_report")
+    if exported_report_data:
+        file_extension = export_format
+        if file_extension.startswith('pdf'):
+            file_extension = file_extension[:3]
+        elif file_extension.startswith('cyclonedx'):
+            file_extension = cyclonedx_format
+        
+        root, _ = os.path.splitext(export_path)
+        export_path = "%s.%s" % (root, file_extension)
+
+        try:
+            save_file(exported_report_data, export_path)
+            logger.info("Exported report saved to %s" % export_path)
+        except Exception as e:
+            logger.error("Error occured while saving report file: {e}")
+
+    return result
 
 
 def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, extra_fields=None):
