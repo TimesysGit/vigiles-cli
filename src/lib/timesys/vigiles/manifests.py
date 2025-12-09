@@ -328,7 +328,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
             save_file(exported_report_data, export_path)
             logger.info("Exported report saved to %s" % export_path)
         except Exception as e:
-            logger.error("Error occured while saving report file: {e}")
+            logger.error(f"Error occured while saving report file: {e}")
 
     return result
 
