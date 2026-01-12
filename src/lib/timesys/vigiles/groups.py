@@ -5,8 +5,15 @@ import timesys
 
 from typing import List, Optional
 
-def get_groups():
+def get_groups(include_private_workspaces=False):
     """Get group info for all active groups available to the current user
+
+    Parameters
+    ----------
+    include_private_workspaces: bool, optional
+        True to include other user's private workspaces. This flag is for
+        admins and org admins. If true, user's private workspaces will be indicated
+        via their email.
 
     Returns
     -------
@@ -24,7 +31,9 @@ def get_groups():
     """
 
     resource = "/api/v1/vigiles/groups"
-    return timesys.llapi.GET(resource)
+    data = {"include_private_workspaces": include_private_workspaces}
+
+    return timesys.llapi.GET(resource, data_dict=data)
 
 
 def get_archived_groups():

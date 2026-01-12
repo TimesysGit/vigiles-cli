@@ -242,7 +242,8 @@ def process_args(argv=None):
     subparser_group = parser_group.add_subparsers(dest="group_command", help='Which group command to execute', required=True)
 
     # group list_active
-    subparser_group.add_parser("list_active", help="Get a list of tokens for all active (not archived) groups available to a user")
+    parser_group_list = subparser_group.add_parser("list_active", help="Get a list of tokens for all active (not archived) groups available to a user")
+    parser_group_list.add_argument('-p', '--include-private-workspaces', action='store_true', default=False, dest='include_private_workspaces', help='Optional parameter for use by admins and organization admins to include private workspaces in group list')
 
     # group list_archived
     subparser_group.add_parser("list_archived", help="Get a list of tokens for all archived groups available to a user")
@@ -581,7 +582,9 @@ if __name__ == '__main__':
                     group_token=parsed_args.group_token,
                 )
             elif group_command == "list_active":
-                result = vigiles.groups.get_groups()
+                result = vigiles.groups.get_groups(
+                    include_private_workspaces=parsed_args.include_private_workspaces
+                )
             elif group_command == "list_archived":
                 result = vigiles.groups.get_archived_groups()
             elif group_command == "info":
