@@ -285,6 +285,7 @@ def process_args(argv=None):
     parser_group_settings_update.add_argument('-g', '--group-token', dest='group_token', help="Optional group token for getting info about a different group than the one configured by a Dashboard Config file. If no Dashboard Config is used, this argument must be provided")
     parser_group_settings_update.add_argument('-i', '--vuln-identifiers', dest='vuln_identifiers', nargs='+', choices=["PURL", "CPE", "CVE Product", "Package Name"])
     parser_group_settings_update.add_argument('-s', '--vuln-strict-match', dest='vuln_strict_match', choices=["on", "off"])
+    parser_group_settings_update.add_argument('-d', '--report-dep-vulns', dest='report_dep_vulns', choices=["on", "off"])
 
     # Commands - group members
     # ========================
@@ -622,7 +623,8 @@ if __name__ == '__main__':
                     result = vigiles.groups.update_group_settings(
                         group_token=parsed_args.group_token,
                         vuln_identifiers=parsed_args.vuln_identifiers,
-                        vuln_strict_match=parsed_args.vuln_strict_match
+                        vuln_strict_match=parsed_args.vuln_strict_match,
+                        report_dep_vulns=parsed_args.report_dep_vulns,
                     )
                 elif settings_command == "info":
                     result = vigiles.groups.get_group_settings(
