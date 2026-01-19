@@ -390,7 +390,7 @@ def get_group_settings(group_token=None):
     return timesys.llapi.GET(resource)
 
 
-def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_match=None):
+def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_match=None, report_dep_vulns=None):
     """Update group settings for a group
 
     If a token is passed, it will be used.
@@ -405,6 +405,8 @@ def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_m
         List of identifiers used to match the vulnerabilities
     vuln_strict_match: str, Optional
         "on" if strict vulnerability based on name and vendor is enabled else "off"
+    report_dep_vulns: str, Optional
+        Enable/Disable vulnerability reporting for package dependencies
 
     Returns
     -------
@@ -429,6 +431,8 @@ def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_m
         payload["vuln_identifiers"] = vuln_identifiers
     if vuln_strict_match is not None:
         payload["vuln_strict_match"] = vuln_strict_match
+    if report_dep_vulns is not None:
+        payload["report_dep_vulns"] = report_dep_vulns
 
     return timesys.llapi.PATCH(resource, data_dict=payload)
 
