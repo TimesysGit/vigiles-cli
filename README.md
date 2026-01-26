@@ -128,14 +128,15 @@ Install dependencies (if not done before)
 pip3 install .[docs]
 ```
 
-Generate HTML docs
+Generate HTML and markdown docs
 
 ```
 cd docs
 make html
+make markdown
 ```
 
-All docs can be found in: {vigiles-cli directoy}/docs/build/html
+All docs can be found in: {vigiles-cli directoy}/docs/build/{html, markdown}
 
 ## Additional Notes
 

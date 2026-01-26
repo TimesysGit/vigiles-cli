@@ -373,9 +373,9 @@ def get_group_settings(group_token=None):
             Group name
         token : str
             Group token
-        "vuln_identifiers": List
+        vuln_identifiers: List
             List of identifiers used to match the vulnerabilities
-        "vuln_strict_match": str
+        vuln_strict_match: str
             "on" if strict vulnerability based on name and vendor is enabled else "off"
     """
 
