@@ -390,7 +390,13 @@ def get_group_settings(group_token=None):
     return timesys.llapi.GET(resource)
 
 
-def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_match=None, report_dep_vulns=None):
+def update_group_settings(
+        group_token=None,
+        vuln_identifiers=None,
+        vuln_strict_match=None,
+        report_dep_vulns=None,
+        auto_close_jira_issues=None,
+    ):
     """Update group settings for a group
 
     If a token is passed, it will be used.
@@ -433,6 +439,8 @@ def update_group_settings(group_token=None, vuln_identifiers=None, vuln_strict_m
         payload["vuln_strict_match"] = vuln_strict_match
     if report_dep_vulns is not None:
         payload["report_dep_vulns"] = report_dep_vulns
+    if auto_close_jira_issues is not None:
+        payload["auto_close_jira_issues"] = auto_close_jira_issues
 
     return timesys.llapi.PATCH(resource, data_dict=payload)
 
