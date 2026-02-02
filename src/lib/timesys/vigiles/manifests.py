@@ -313,7 +313,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
 
     result = timesys.llapi.POST(resource, data)
 
-    exported_report_data = result.pop("exported_report")
+    exported_report_data = result.pop("exported_report", None)
     if exported_report_data:
         file_extension = export_format
         if file_extension.startswith('pdf'):
