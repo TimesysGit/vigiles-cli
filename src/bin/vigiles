@@ -99,6 +99,11 @@ def process_args(argv=None):
         help="Verify Key File and server availability",
     )
 
+    subparsers.add_parser(
+        "about",
+        help="Return app and database versions",
+    )
+
     # Commands - Manifests
     # ====================
     parser_manifest = subparsers.add_parser("manifest", help="Commands related to manifests and manifest tokens")
@@ -414,6 +419,8 @@ if __name__ == '__main__':
     try:
         if parsed_args.command in ['heartbeat', 'test']:
             result = utilities.heartbeat()
+        elif parsed_args.command == "about":
+            result = utilities.get_app_db_version()
         elif parsed_args.command == "manifest":
             manifest_command = parsed_args.manifest_command
             if manifest_command == "upload":
