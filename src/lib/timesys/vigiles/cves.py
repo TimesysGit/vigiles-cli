@@ -99,3 +99,44 @@ def set_status(scope, cve_id, package_name, status, justification=None, justific
         data["group_tokens"] = group_tokens
 
     return timesys.llapi.POST(resource, data_dict=data)
+
+
+def get_vuln_status(
+    cve_id: str, 
+    package_name: str, 
+    package_version: str,
+    manifest_token: str,
+):
+    """Get Status for a vulnerability reported against SBOM
+
+    Parameters
+    ----------
+    cve_id : str
+        CVE ID for vulnerability status
+    package_name : str
+        Name of the package for which the vulnerability status is requested
+    package_version : str
+        Version of the package for which the vulnerability status is requested
+    manifest_token : str
+        SBOM token
+    """
+    if not cve_id:
+        raise Exception("cve_id is required")
+    
+    if not package_name:
+        raise Exception("package_name is required")
+
+    if not package_version:
+        raise Exception("package_version is required")
+
+    if not manifest_token:
+        raise Exception("manifest_token is required")
+    
+    data = {
+        "manifest_token": manifest_token,
+        "package_name": package_name,
+        "package_version": package_version
+    }
+
+    resource = f"/api/v1/vigiles/cves/{cve_id}/vuln-status"
+    return timesys.llapi.GET(resource, data_dict=data)
