@@ -362,6 +362,11 @@ def process_args(argv=None):
     parser_set_vuln_status.add_argument('-g', '--groups', dest='group_tokens', nargs='*', help='One or more group tokens to apply vuln status to. Should only be used when scope is group')
     parser_set_vuln_status.add_argument('-m', '--manifests', dest='manifest_tokens', nargs='*', help='One or more manifest tokens to apply vuln status to. Should only be used when scope is manifest')
 
+    parser_get_vuln_status = subparser_cves.add_parser("status", help="Get Status for a vulnerability")
+    parser_get_vuln_status.add_argument("cve_id", metavar="cve-id", help="Vulnerability ID to get vulnerability status")
+    parser_get_vuln_status.add_argument("package_name", metavar="package-name", help="Package name to get vulnerability status")
+    parser_get_vuln_status.add_argument("package_version", metavar="package-version", help="Package version to get vulnerability status")
+    parser_get_vuln_status.add_argument("manifest_token", metavar="manifest-token", help="Manifest token to get vulnerability status")
 
     # Return parsed commands
     parsed_args = parser.parse_args()
@@ -685,6 +690,13 @@ if __name__ == '__main__':
                     parsed_args.version,
                     parsed_args.manifest_tokens,
                     parsed_args.group_tokens,
+                )
+            elif cves_command == "status":
+                result = vigiles.cves.get_vuln_status(
+                    parsed_args.cve_id,
+                    parsed_args.package_name,
+                    parsed_args.package_version,
+                    parsed_args.manifest_token,
                 )
         else:
             raise Exception(f'Unhandled command: {parsed_args.command}')
