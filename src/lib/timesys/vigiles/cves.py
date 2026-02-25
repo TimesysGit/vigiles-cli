@@ -102,8 +102,8 @@ def set_status(scope, cve_id, package_name, status, justification=None, justific
 
 
 def get_vuln_status(
-    cve_id: str, 
-    package_name: str, 
+    cve_id: str,
+    package_name: str,
     package_version: str,
     manifest_token: str,
 ):
@@ -119,10 +119,15 @@ def get_vuln_status(
         Version of the package for which the vulnerability status is requested
     manifest_token : str
         SBOM token
+
+    Returns
+    -------
+    dict
+        Vulnerability status data against SBOM
     """
     if not cve_id:
         raise Exception("cve_id is required")
-    
+
     if not package_name:
         raise Exception("package_name is required")
 
@@ -131,7 +136,7 @@ def get_vuln_status(
 
     if not manifest_token:
         raise Exception("manifest_token is required")
-    
+
     data = {
         "manifest_token": manifest_token,
         "package_name": package_name,

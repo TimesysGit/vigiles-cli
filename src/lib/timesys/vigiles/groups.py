@@ -377,6 +377,10 @@ def get_group_settings(group_token=None):
             List of identifiers used to match the vulnerabilities
         "vuln_strict_match": str
             "on" if strict vulnerability based on name and vendor is enabled else "off"
+        report_dep_vulns: str
+            "on" if report_dep_vulns is enabled else "off"
+        auto_close_jira_issues: str
+            "on" if auto_close_jira_issues is enabled else "off"
     """
 
     if group_token is None:
@@ -413,6 +417,9 @@ def update_group_settings(
         "on" if strict vulnerability based on name and vendor is enabled else "off"
     report_dep_vulns: str, Optional
         Enable/Disable vulnerability reporting for package dependencies
+    auto_close_jira_issues: str, Optional
+        Automatically close Jira issues when the associated vulnerability no longer appears in the latest report
+        Accepted options: ["on", "off"]
 
     Returns
     -------
