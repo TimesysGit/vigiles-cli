@@ -16,7 +16,8 @@ help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 markdown:
-	@$(SPHINXBUILD) -b markdown "$(SOURCEDIR)" "$(BUILDDIR)/markdown" $(SPHINXOPTS) $(0)
+	@$(SPHINXAPIDOC) -f -e -M --ext-autodoc -o "$(SOURCEDIR)" "$(MODULEPATH)"
+	@$(SPHINXBUILD) -b markdown "$(SOURCEDIR)" "$(BUILDDIR)/markdown" $(SPHINXOPTS) $(O)
 
 .PHONY: help Makefile
 
