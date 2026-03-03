@@ -145,12 +145,12 @@ def get_group_info(group_token=None, subgroups=False):
 
 
 def bulk_archive_groups(tokens: List[str]):
-    """Mark multiple groups as archived
+    """Archive multiple groups
 
     Parameters
     ----------
     tokens : List[str]
-        List of group tokens to mark as archived
+        List of group token to archive
     """
 
     data = {"tokens": tokens}
@@ -160,12 +160,12 @@ def bulk_archive_groups(tokens: List[str]):
 
 
 def bulk_unarchive_groups(tokens: List[str]):
-    """Mark multiple groups as unarchived
+    """Unarchive multiple groups
 
     Parameters
     ----------
     tokens : List[str]
-        List of group tokens to mark as unarchived
+        List of group token to unarchive
     """
 
     data = {"tokens": tokens}
