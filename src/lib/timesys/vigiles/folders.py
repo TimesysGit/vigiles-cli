@@ -2,9 +2,10 @@
 # SPDX-License-Identifier: MIT
 
 import timesys
+from typing import List
 
 
-def get_folders(group_token=None, folder_token=None):
+def get_folders(group_token=None, folder_token=None, archived_only=False):
     """Get all folders that are owned by the current user.
 
     If a group token is configured on the llapi object, only folders belonging
@@ -12,6 +13,9 @@ def get_folders(group_token=None, folder_token=None):
 
     If a folder token is configured on the llapi object, only folders belonging
     to that folder will be returned.
+
+    By default, only active folders are returned. If the `archived_only` parameter is set to True,
+    only archived folders will be returned
 
     Returns
     -------
@@ -28,6 +32,8 @@ def get_folders(group_token=None, folder_token=None):
         data["group_token"] = group_token
     if folder_token:
         data["folder_token"] = folder_token
+    if archived_only:
+        data["archived_only"] = archived_only
 
     resource = "/api/v1/vigiles/folders"
     return timesys.llapi.GET(resource, data_dict=data)
@@ -56,7 +62,44 @@ def create_folder(folder_name, description=None, group_token=None, folder_token=
     if folder_token:
         data["folder_token"] = folder_token
 
-    return timesys.llapi.POST(
-        "/api/v1/vigiles/folders",
-        data_dict=data
-    )
+    return timesys.llapi.POST("/api/v1/vigiles/folders", data_dict=data)
+
+
+def archive_folders(tokens: List[str]):
+    """
+    Archive multiple folders
+
+    Parameters
+    ----------
+    tokens : List[str]
+        List of folder token to archive
+
+    Returns
+    -------
+    dict
+        A JSON response indicating success or failure of the request.
+    """
+
+    data = {"tokens": tokens}
+    resource = "/api/v1/vigiles/folders/archive"
+    return timesys.llapi.PATCH(resource, data_dict=data)
+
+
+def unarchive_folders(tokens: List[str]):
+    """
+    Unarchive multiple folders
+
+    Parameters
+    ----------
+    tokens : List[str]
+        List of folder token to unarchive
+
+    Returns
+    -------
+    dict
+        A JSON response indicating success or failure of the request.
+    """
+
+    data = {"tokens": tokens}
+    resource = "/api/v1/vigiles/folders/unarchive"
+    return timesys.llapi.PATCH(resource, data_dict=data)
