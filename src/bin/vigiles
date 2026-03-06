@@ -424,15 +424,21 @@ if __name__ == '__main__':
     if parsed_args.command == 'version':
         print(llapi.version)
         sys.exit(0)
+    
+    # Catch key/config load failures here to avoid raw traceback output in CLI
+    try:
+        # Configure LLAPI object
+        llapi.configure(
+            key_file_path=key_file_path,
+            dashboard_config_path=dash_config_path,
+            verify_cert=parsed_args.verify_cert,
+            url=parsed_args.url,
+            dry_run=parsed_args.dry_run,
+        )
+    except Exception as err:
+        print(err)
+        sys.exit(1)
 
-    # Configure LLAPI object
-    llapi.configure(
-        key_file_path=key_file_path,
-        dashboard_config_path=dash_config_path,
-        verify_cert=parsed_args.verify_cert,
-        url=parsed_args.url,
-        dry_run=parsed_args.dry_run,
-    )
     # Call the corresponding API method for the given command line args
     try:
         if parsed_args.command in ['heartbeat', 'test']:
