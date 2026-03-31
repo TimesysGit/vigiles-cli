@@ -144,7 +144,7 @@ def process_args(argv=None):
     parser_upload_manifest.add_argument('--export-format', dest='export_format', help='File format for the exported report', choices=['pdf', 'pdfsummary', 'xlsx', 'csv', 'cyclonedx-vex', 'cyclonedx-sbom-vex'])
     parser_upload_manifest.add_argument('--export-path', dest='export_path', help='File path where the exported report will be saved.')
     parser_upload_manifest.add_argument('--cyclonedx-format', dest='cyclonedx_format', default='json', help='CycloneDX file format to download report in VEX format', choices=['json', 'xml'])
-    parser_upload_manifest.add_argument('--cyclonedx-version', dest='cyclonedx_version', default='1.6', help='CycloneDX spec version to download report in VEX format', choices=['1.4', '1.5', '1.6'])
+    parser_upload_manifest.add_argument('--cyclonedx-version', dest='cyclonedx_version', default='1.7', help='CycloneDX spec version to download report in VEX format', choices=['1.4', '1.5', '1.6', '1.7'])
 
     # manifest delete
     parser_manifest_delete = subparser_manifest.add_parser("delete", help="Delete a manifest with a given token. This can NOT be undone!")
@@ -212,7 +212,7 @@ def process_args(argv=None):
     report_download_group.add_argument("-o", "--outfile", dest="outfile", help="Path to output file. Existing files will be overwritten!")
     report_download_group.add_argument("--stdout", dest="stdout", action="store_true", help="Write downloaded bytes to stdout")
     parser_report_download.add_argument("--cyclonedx-format", dest="cyclonedx_format", default="json", help="CycloneDX file format to download report in VEX format", choices=["json", "xml"])
-    parser_report_download.add_argument("--cyclonedx-version", dest="cyclonedx_version", default="1.6", help="CycloneDX spec version to download report in VEX format", choices=["1.4", "1.5", "1.6"])
+    parser_report_download.add_argument("--cyclonedx-version", dest="cyclonedx_version", default="1.7", help="CycloneDX spec version to download report in VEX format", choices=["1.4", "1.5", "1.6", "1.7"])
 
     # compare two reports
     parser_report_compare = subparser_reports.add_parser("compare", help="Compare two CVE reports with given tokens")

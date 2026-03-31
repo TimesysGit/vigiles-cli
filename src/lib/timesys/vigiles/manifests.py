@@ -216,7 +216,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     cyclonedx_version: str, optional
         If export_format is selected as cyclonedx-vex or cyclonedx-sbom-vex, then this option is used to specify
         the version of the cyclonedx vex report
-        One of "1.4", "1.5", "1.6"
+        One of "1.4", "1.5", "1.6", "1.7"
 
     Returns
     -------

@@ -4,7 +4,7 @@
 import timesys
 
 
-def download_report(report_token, format=None, filter_results=False, cyclonedx_format="json", cyclonedx_version="1.6"):
+def download_report(report_token, format=None, filter_results=False, cyclonedx_format="json", cyclonedx_version="1.7"):
     """Get a CVE report as a file from the given report token
 
     Parameters
@@ -27,7 +27,7 @@ def download_report(report_token, format=None, filter_results=False, cyclonedx_f
 
     cyclonedx_version : str
         CycloneDX spec version to download report in vex format
-        Default: 1.6
+        Default: 1.7
 
     Returns
     -------
