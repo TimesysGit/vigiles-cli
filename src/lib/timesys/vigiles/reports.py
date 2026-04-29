@@ -14,7 +14,7 @@ def download_report(report_token, format=None, filter_results=False, cyclonedx_f
 
     format : str
         What file format to return from the following:
-        "csv", "pdf", "pdfsummary", "xlsx"
+        "csv", "pdf", "pdfsummary", "xlsx", "cyclonedx-vex", "cyclonedx-sbom-vex"
 
     filter_results : bool
         True to apply all configured filters to scan results,
