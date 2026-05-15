@@ -14,7 +14,7 @@ def download_report(report_token, format=None, filter_results=False, cyclonedx_f
 
     format : str
         What file format to return from the following:
-        "csv", "pdf", "pdfsummary", "xlsx", "cyclonedx-vex", "cyclonedx-sbom-vex"
+        "csv", "pdf", "pdfsummary", "xlsx", "cyclonedx-vex", "cyclonedx-sbom-vex", "spdx_3-sbom-vex"
 
     filter_results : bool
         True to apply all configured filters to scan results,
@@ -35,7 +35,7 @@ def download_report(report_token, format=None, filter_results=False, cyclonedx_f
         CVE Report data in bytes from the requested file type
     """
 
-    valid_formats = ["csv", "pdf", "pdfsummary", "xlsx", "cyclonedx-vex", "cyclonedx-sbom-vex"]
+    valid_formats = ["csv", "pdf", "pdfsummary", "xlsx", "cyclonedx-vex", "cyclonedx-sbom-vex", "spdx_3-sbom-vex"]
 
     if not report_token:
         raise Exception("report_token is required")

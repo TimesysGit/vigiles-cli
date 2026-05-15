@@ -206,7 +206,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         One of "none", "daily", "weekly", or "monthly"
     export_format: str, optional
         If provided, a vulnerability report will be downloaded at the specified path
-        One of "pdf", "pdfsummary", "xlsx", "csv", "cyclonedx-vex", "cyclonedx-sbom-vex"
+        One of "pdf", "pdfsummary", "xlsx", "csv", "cyclonedx-vex", "cyclonedx-sbom-vex", "spdx_3-sbom-vex"
     export_path: str, optional
         If provided with export_format, will be used to save the vulnerability report
     cyclonedx_format: str, optional
@@ -320,6 +320,8 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
             file_extension = file_extension[:3]
         elif file_extension.startswith('cyclonedx'):
             file_extension = cyclonedx_format
+        elif file_extension == "spdx_3-sbom-vex":
+            file_extension = 'spdx3.json'
         
         root, _ = os.path.splitext(export_path)
         export_path = "%s.%s" % (root, file_extension)
