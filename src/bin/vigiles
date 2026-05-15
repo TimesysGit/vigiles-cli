@@ -141,7 +141,7 @@ def process_args(argv=None):
     parser_upload_manifest.add_argument('-e', '--extra-fields', dest='extra_fields', help='Comma separated list of extra CVE attributes to include if results are returned. Acceptable values are: "assigner", "description", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
     parser_upload_manifest.add_argument('-E', '--ecosystems', dest='ecosystems', help='Comma separated string of ecosystems that should be used for generating reports')
     parser_upload_manifest.add_argument('-S', '--subscribe', dest='subscribe', help='Manifest notification frequency.  Acceptable values are: "none", "daily", "weekly", "monthly".  Default is "none".')
-    parser_upload_manifest.add_argument('--export-format', dest='export_format', help='File format for the exported report', choices=['pdf', 'pdfsummary', 'xlsx', 'csv', 'cyclonedx-vex', 'cyclonedx-sbom-vex'])
+    parser_upload_manifest.add_argument('--export-format', dest='export_format', help='File format for the exported report', choices=['pdf', 'pdfsummary', 'xlsx', 'csv', 'cyclonedx-vex', 'cyclonedx-sbom-vex', 'spdx_3-sbom-vex'])
     parser_upload_manifest.add_argument('--export-path', dest='export_path', help='File path where the exported report will be saved.')
     parser_upload_manifest.add_argument('--cyclonedx-format', dest='cyclonedx_format', default='json', help='CycloneDX file format to download report in VEX format', choices=['json', 'xml'])
     parser_upload_manifest.add_argument('--cyclonedx-version', dest='cyclonedx_version', default='1.7', help='CycloneDX spec version to download report in VEX format', choices=['1.4', '1.5', '1.6', '1.7'])
@@ -205,7 +205,7 @@ def process_args(argv=None):
 
     # report download (just bytes)
     parser_report_download = subparser_reports.add_parser("download", help="Get CVE report in a specified file format")
-    parser_report_download.add_argument('file_type', metavar='file-type', help='Filetype for the exported report', choices=["pdf", "pdfsummary", "xlsx", "csv", "cyclonedx-vex", "cyclonedx-sbom-vex"])
+    parser_report_download.add_argument('file_type', metavar='file-type', help='Filetype for the exported report', choices=["pdf", "pdfsummary", "xlsx", "csv", "cyclonedx-vex", "cyclonedx-sbom-vex", "spdx_3-sbom-vex"])
     parser_report_download.add_argument('report_token', metavar='report-token', help='Token of the report to download')
     parser_report_download.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to report (only config filters applied if omitted)')
     report_download_group = parser_report_download.add_mutually_exclusive_group(required=True)
