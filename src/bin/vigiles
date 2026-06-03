@@ -437,7 +437,7 @@ if __name__ == '__main__':
             dry_run=parsed_args.dry_run,
         )
     except Exception as err:
-        print(err)
+        print(err, file=sys.stderr)
         sys.exit(1)
 
     # Call the corresponding API method for the given command line args
@@ -731,7 +731,8 @@ if __name__ == '__main__':
         else:
             raise Exception(f'Unhandled command: {parsed_args.command}')
     except Exception as err:
-        print(err)
+        print(err, file=sys.stderr)
+        sys.exit(1)
     else:  # command returned normally
         if parsed_args.no_format:
             print(result)
