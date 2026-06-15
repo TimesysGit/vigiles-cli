@@ -381,6 +381,8 @@ def get_group_settings(group_token=None):
             "on" if report_dep_vulns is enabled else "off"
         auto_close_jira_issues: str
             "on" if auto_close_jira_issues is enabled else "off"
+        generate_vuln_attr_on_date: str
+            "on" if generate_vuln_attr_on_date is enable else "off"
     """
 
     if group_token is None:
@@ -400,6 +402,7 @@ def update_group_settings(
         vuln_strict_match=None,
         report_dep_vulns=None,
         auto_close_jira_issues=None,
+        generate_vuln_attr_on_date=None,
     ):
     """Update group settings for a group
 
@@ -419,6 +422,9 @@ def update_group_settings(
         Enable/Disable vulnerability reporting for package dependencies
     auto_close_jira_issues: str, Optional
         Automatically close Jira issues when the associated vulnerability no longer appears in the latest report
+        Accepted options: ["on", "off"]
+    generate_vuln_attr_on_date: str, Optional
+        Enable detection of the first occurrence of a vulnerability in the SBOM chain during report scan, which may affect the scan duration
         Accepted options: ["on", "off"]
 
     Returns
@@ -448,6 +454,8 @@ def update_group_settings(
         payload["report_dep_vulns"] = report_dep_vulns
     if auto_close_jira_issues is not None:
         payload["auto_close_jira_issues"] = auto_close_jira_issues
+    if generate_vuln_attr_on_date is not None:
+        payload["generate_vuln_attr_on_date"] = generate_vuln_attr_on_date
 
     return timesys.llapi.PATCH(resource, data_dict=payload)
 
