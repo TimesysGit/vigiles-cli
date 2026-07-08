@@ -425,7 +425,7 @@ if __name__ == '__main__':
     if parsed_args.command == 'version':
         print(llapi.version)
         sys.exit(0)
-    
+
     # Catch key/config load failures here to avoid raw traceback output in CLI
     try:
         # Configure LLAPI object
