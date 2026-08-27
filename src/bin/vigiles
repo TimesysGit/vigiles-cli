@@ -15,6 +15,7 @@ from timesys import (
     utilities,
     vigiles,
 )
+from timesys.vigiles.jobs import DEFAULT_JOB_TIMEOUT
 
 
 def configure_logger(logger, level=logging.INFO, format="%(asctime)s : %(name)s : %(levelname)s : %(message)s"):
@@ -145,6 +146,8 @@ def process_args(argv=None):
     parser_upload_manifest.add_argument('--export-path', dest='export_path', help='File path where the exported report will be saved.')
     parser_upload_manifest.add_argument('--cyclonedx-format', dest='cyclonedx_format', default='json', help='CycloneDX file format to download report in VEX format', choices=['json', 'xml'])
     parser_upload_manifest.add_argument('--cyclonedx-version', dest='cyclonedx_version', default='1.7', help='CycloneDX spec version to download report in VEX format', choices=['1.4', '1.5', '1.6', '1.7'])
+    parser_upload_manifest.add_argument('--return-job', action='store_true', help='Return the submitted job information immediately without waiting for results')
+    parser_upload_manifest.add_argument('--timeout', type=int, default=DEFAULT_JOB_TIMEOUT, help=f'Maximum seconds to wait for a background job (default: {DEFAULT_JOB_TIMEOUT})')
 
     # manifest delete
     parser_manifest_delete = subparser_manifest.add_parser("delete", help="Delete a manifest with a given token. This can NOT be undone!")
@@ -157,6 +160,8 @@ def process_args(argv=None):
     parser_manifest_rescan.add_argument('-e', '--extra-fields', dest='extra_fields', help='Comma separated list of extra CVE attributes to include if results are returned. Acceptable values are: "assigner", "description", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
     parser_manifest_rescan.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to report (only config filters applied if ommitted)')
     parser_manifest_rescan.add_argument('-o', '--rescan-only', action='store_true', dest='rescan_only', help='Rescan the manifest but do not return the report data')
+    parser_manifest_rescan.add_argument('--return-job', action='store_true', help='Return the submitted job information immediately without waiting for results')
+    parser_manifest_rescan.add_argument('--timeout', type=int, default=DEFAULT_JOB_TIMEOUT, help=f'Maximum seconds to wait for a background job (default: {DEFAULT_JOB_TIMEOUT})')
 
     # manifest latest-report
     parser_manifest_latest = subparser_manifest.add_parser("latest-report", help="Get the most recent report for a manifest with a given token")
@@ -487,6 +492,8 @@ if __name__ == '__main__':
                     upload_only=parsed_args.upload_only,
                     ecosystems=parsed_args.ecosystems,
                     subscribe=parsed_args.subscribe,
+                    return_job=parsed_args.return_job,
+                    timeout=parsed_args.timeout,
                     **export_params
                 )
             elif manifest_command == "list":
@@ -531,6 +538,8 @@ if __name__ == '__main__':
                     filter_results=parsed_args.filter_results,
                     extra_fields=parsed_args.extra_fields,
                     rescan_only=parsed_args.rescan_only,
+                    return_job=parsed_args.return_job,
+                    timeout=parsed_args.timeout,
                 )
             elif manifest_command == "latest-report":
                 result = vigiles.manifests.get_latest_report(

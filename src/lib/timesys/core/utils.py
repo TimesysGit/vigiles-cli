@@ -7,7 +7,7 @@ import gzip
 from io import BytesIO
 
 def save_file(data, file_path):
-    """Utility function to save 
+    """Utility function to save
 
     Parameters
     ----------
@@ -23,3 +23,33 @@ def save_file(data, file_path):
 
     with open(file_path, "wb") as report_file:
         report_file.write(file_content)
+
+
+def validate_int(val, min=None, max=None):
+    """Return whether *val* is an integer within the optional inclusive bounds.
+
+    Parameters
+    ----------
+    val : object
+        Value to validate.
+    min : int, optional
+        Minimum accepted value.
+    max : int, optional
+        Maximum accepted value.
+
+    Returns
+    -------
+    bool
+        ``True`` when val is an integer and satisfies both bounds; otherwise
+        ``False``.
+    """
+    if not isinstance(val, int):
+        return False
+
+    if min is not None and val < min:
+        return False
+
+    if max is not None and val > max:
+        return False
+
+    return True

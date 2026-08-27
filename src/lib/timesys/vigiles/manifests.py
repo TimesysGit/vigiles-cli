@@ -6,7 +6,8 @@ import os
 import timesys
 
 from typing import List, Optional
-from timesys.core.utils import save_file
+from timesys.core.utils import save_file, validate_int
+from timesys.vigiles.jobs import DEFAULT_JOB_TIMEOUT, wait_for_job
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,17 @@ UBUNTU = ['Ubuntu', 'Ubuntu:14.04:LTS', 'Ubuntu:16.04:LTS', 'Ubuntu:18.04:LTS', 
 OTHERS = ['Android', 'Bitnami', 'CRAN', 'GIT', 'GSD', 'GitHub Actions', 'Go', 'Hackage', 'Hex', 'Linux', 'Maven', 'NuGet', 'OSS-Fuzz', 'Packagist', 'Pub', 'PyPI', 'RubyGems', 'SwiftURL', 'UVI', 'crates.io', 'npm']
 
 ALL_ECOSYSTEMS = OTHERS + ALMALINUX + ALPINE + DEBIAN + ROCKY + UBUNTU
+
+def _get_async_report_result(job_result, filter_results, extra_fields):
+    manifest_token = job_result.get("manifest_token")
+    if not manifest_token:
+        raise Exception("Completed Vigiles job did not return a manifest_token")
+    return get_latest_report(
+        manifest_token,
+        filter_results=filter_results,
+        extra_fields=extra_fields,
+    )
+
 
 def get_manifests():
     """Get all manifests that are accessible by the current user
@@ -159,10 +171,10 @@ def get_manifest_file(manifest_token, sbom_format=None, file_format=None, sbom_v
     return timesys.llapi.GET(resource, data_dict=data, json=False)
 
 
-def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None, 
-                    subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False, 
+def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_name=None,
+                    subfolder_name=None, filter_results=False, extra_fields=None, upload_only=False,
                     ecosystems=None, subscribe=None, export_format=None, export_path=None,
-                    cyclonedx_format=None, cyclonedx_version=None):
+                    cyclonedx_format=None, cyclonedx_version=None, return_job=False, timeout=DEFAULT_JOB_TIMEOUT):
     """Upload and scan (optionally) a manifest
 
     If a group_token is configured on the llapi object, it will be used as the upload location.
@@ -217,6 +229,11 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         If export_format is selected as cyclonedx-vex or cyclonedx-sbom-vex, then this option is used to specify
         the version of the cyclonedx vex report
         One of "1.4", "1.5", "1.6", "1.7"
+    return_job : bool
+        Return submitted job information immediately instead of waiting for results.
+        Default: False
+    timeout : int, optional
+        Maximum seconds to wait for a background job. Default: 600
 
     Returns
     -------
@@ -242,6 +259,8 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         exported_manifest
             The manifest data in SPDX format
     """
+    if not validate_int(timeout, min=1):
+        raise Exception("Job timeout must be a positive integer number of seconds")
 
     if not manifest:
         raise Exception('manifest data is required')
@@ -252,6 +271,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         "manifest": manifest,
         "filter_results": filter_results,
         "upload_only": upload_only,
+        "async": not export_format, # async jobs don't work for exporting report right now
     }
 
     if kernel_config is not None:
@@ -313,6 +333,17 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
 
     result = timesys.llapi.POST(resource, data)
 
+    # Modern Vigiles returns job information. Older versions ignore async param and return the finished result directly
+    if (not return_job and not export_format and not getattr(timesys.llapi, "dry_run", False) and result.get("job_id")):
+        job_result = wait_for_job(result["job_id"], timeout)
+        if upload_only:
+            return {
+                "manifest_token": job_result.get("manifest_token"),
+                "group_token": job_result.get("group_token"),
+                "folder_token": job_result.get("folder_token"),
+            }
+        result = _get_async_report_result(job_result, filter_results, extra_fields)
+
     exported_report_data = result.pop("exported_report", None)
     if exported_report_data:
         file_extension = export_format
@@ -322,7 +353,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
             file_extension = cyclonedx_format
         elif file_extension == "spdx_3-sbom-vex":
             file_extension = 'spdx3.json'
-        
+
         root, _ = os.path.splitext(export_path)
         export_path = "%s.%s" % (root, file_extension)
 
@@ -335,7 +366,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     return result
 
 
-def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, extra_fields=None):
+def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, extra_fields=None, return_job=False, timeout=DEFAULT_JOB_TIMEOUT):
     """Generate a new report for the given manifest_token
 
     Parameters
@@ -351,6 +382,11 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
     extra_fields : list of str, optional
         Optionally extend CVE data included in report with any of the following fields:
             "assigner", "description", "impact", "modified", "problem_types", "published", "references"
+    return_job : bool
+        Return job information immediately instead of waiting for results.
+        Default: False
+    timeout : int, optional
+        Maximum seconds to wait for a background job. Default: 600
 
     Returns
     -------
@@ -376,6 +412,9 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
         exported_manifest
             The manifest data in SPDX format
     """
+    if not validate_int(timeout, min=1):
+        raise Exception("Job timeout must be a positive integer number of seconds")
+
     if not manifest_token:
         raise Exception('manifest_token is required')
 
@@ -384,6 +423,7 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
         "manifest": manifest_token,
         "rescan_only": rescan_only,
         "filtered": filter_results,
+        "async": True,
     }
 
     if extra_fields is not None:
@@ -391,7 +431,14 @@ def rescan_manifest(manifest_token, rescan_only=False, filter_results=False, ext
             raise Exception("Parameter 'extra_fields' must be a list of strings") from None
         data["with_field"] = extra_fields  # will be split into repeated params
 
-    return timesys.llapi.POST(resource, data)
+    result = timesys.llapi.POST(resource, data)
+    if return_job or getattr(timesys.llapi, "dry_run", False) or not result.get("job_id"):
+        return result
+
+    job_result = wait_for_job(result["job_id"], timeout)
+    if rescan_only:
+        return job_result
+    return _get_async_report_result(job_result, filter_results, extra_fields)
 
 
 def delete_manifest(manifest_token, confirmed=False):
@@ -550,9 +597,9 @@ def set_custom_score(manifest_token, product_name, cve_id, custom_score, product
 
 
 def bulk_move_manifests(
-    sbom_tokens: List[str], 
-    target_group_token: Optional[str] = None, 
-    target_folder_token: Optional[str] = None, 
+    sbom_tokens: List[str],
+    target_group_token: Optional[str] = None,
+    target_folder_token: Optional[str] = None,
     include_history: bool = False
 ):
     """Move multiple SBOMs to a group/folder
@@ -570,13 +617,13 @@ def bulk_move_manifests(
     """
     if not any([target_group_token, target_folder_token]):
         raise Exception("Please specify either a target group or target folder token")
-    
+
     data = {
         "sbom_tokens": sbom_tokens,
         "copy": False,
         "include_history": include_history
     }
-    
+
     if target_folder_token:
         data['target_folder_token'] = target_folder_token
     if target_group_token:
@@ -586,9 +633,9 @@ def bulk_move_manifests(
 
 
 def bulk_copy_manifests(
-    sbom_tokens: List[str], 
-    target_group_token: Optional[str] = None, 
-    target_folder_token: Optional[str] = None, 
+    sbom_tokens: List[str],
+    target_group_token: Optional[str] = None,
+    target_folder_token: Optional[str] = None,
     include_history: bool = False
 ):
     """Copy multiple SBOMs to a group/folder
@@ -606,13 +653,13 @@ def bulk_copy_manifests(
     """
     if not any([target_group_token, target_folder_token]):
         raise Exception("Please specify either a target group or target folder token")
-    
+
     data = {
         "sbom_tokens": sbom_tokens,
         "copy": True,
         "include_history": include_history
     }
-    
+
     if target_folder_token:
         data['target_folder_token'] = target_folder_token
     if target_group_token:
