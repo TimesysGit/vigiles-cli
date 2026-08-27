@@ -4,6 +4,7 @@
 from timesys.vigiles import (
     cves,
     folders,
+    jobs,
     manifests,
     groups,
     reports,
