@@ -11,14 +11,6 @@ from timesys.vigiles.jobs import DEFAULT_JOB_TIMEOUT, wait_for_job
 
 logger = logging.getLogger(__name__)
 
-ALMALINUX = ['AlmaLinux', 'AlmaLinux:8', 'AlmaLinux:9']
-ALPINE = ['Alpine', 'Alpine:v3.10', 'Alpine:v3.11', 'Alpine:v3.12', 'Alpine:v3.13', 'Alpine:v3.14', 'Alpine:v3.15', 'Alpine:v3.16', 'Alpine:v3.17', 'Alpine:v3.18', 'Alpine:v3.19', 'Alpine:v3.2', 'Alpine:v3.20', 'Alpine:v3.3', 'Alpine:v3.4', 'Alpine:v3.5','Alpine:v3.6', 'Alpine:v3.7', 'Alpine:v3.8', 'Alpine:v3.9']
-DEBIAN = ['Debian', 'Debian:10', 'Debian:11', 'Debian:12', 'Debian:13', 'Debian:3.0', 'Debian:3.1', 'Debian:4.0', 'Debian:5.0', 'Debian:6.0', 'Debian:7', 'Debian:8', 'Debian:9']
-ROCKY = ['Rocky Linux', 'Rocky Linux:8', 'Rocky Linux:9']
-UBUNTU = ['Ubuntu', 'Ubuntu:14.04:LTS', 'Ubuntu:16.04:LTS', 'Ubuntu:18.04:LTS', 'Ubuntu:20.04:LTS', 'Ubuntu:22.04:LTS', 'Ubuntu:23.10', 'Ubuntu:24.04:LTS', 'Ubuntu:Pro:14.04:LTS', 'Ubuntu:Pro:16.04:LTS', 'Ubuntu:Pro:18.04:LTS', 'Ubuntu:Pro:20.04:LTS', 'Ubuntu:Pro:22.04:LTS', 'Ubuntu:Pro:24.04:LTS']
-OTHERS = ['Android', 'Bitnami', 'CRAN', 'GIT', 'GSD', 'GitHub Actions', 'Go', 'Hackage', 'Hex', 'Linux', 'Maven', 'NuGet', 'OSS-Fuzz', 'Packagist', 'Pub', 'PyPI', 'RubyGems', 'SwiftURL', 'UVI', 'crates.io', 'npm']
-
-ALL_ECOSYSTEMS = OTHERS + ALMALINUX + ALPINE + DEBIAN + ROCKY + UBUNTU
 
 def _get_async_report_result(job_result, filter_results, extra_fields):
     manifest_token = job_result.get("manifest_token")
@@ -211,7 +203,7 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
     upload_only : bool
         If true, do not generate an initial CVE report for the uploaded manifest
         Default: False
-    ecosystems : list of ecosystems, optional
+    ecosystems : comma separated ecosystem names or "all", optional
         If provided, the input ecosystems will be used to generate reports
     subscribe : str, optional
         If provided, the user will be subscribed to the notifications at the given frequency
@@ -292,20 +284,8 @@ def upload_manifest(manifest, kernel_config=None, uboot_config=None, manifest_na
         data["with_field"] = extra_fields  # will be split into repeated params
 
     if ecosystems is not None:
-        ecosystems_str = ecosystems
-        ecosystems = []
-        if ecosystems_str.lower() == "all":
-            ecosystems = ALL_ECOSYSTEMS
-        else:
-            invalid_ecosystems = set()
-            ecosystems = [esys.strip() for esys in ecosystems_str.split(",")]
-            for ecosystem in ecosystems:
-                if ecosystem not in ALL_ECOSYSTEMS:
-                    invalid_ecosystems.add(ecosystem)
-            if invalid_ecosystems:
-                logger.warning('Skipping invalid ecosystems: %s. Refer to README.md for valid ecosystems.' % ",".join(invalid_ecosystems))
-            ecosystems = [item for item in ecosystems if item not in invalid_ecosystems]
-        data["ecosystems"] = ",".join(ecosystems)
+        ecosystems = ",".join(ecosystem.strip() for ecosystem in ecosystems.split(","))
+        data["ecosystems"] = ecosystems
 
     if subscribe is not None:
         data["subscribe"] = subscribe
