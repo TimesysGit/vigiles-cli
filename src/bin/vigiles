@@ -140,7 +140,7 @@ def process_args(argv=None):
     parser_upload_manifest.add_argument('-o', '--upload-only', action='store_true', dest='upload_only', help='Upload manifest but do not generate a report')
     parser_upload_manifest.add_argument('-f', '--filter-results', action='store_true', default=False, dest='filter_results', help='Apply all filters to resulting report (only config filters applied if omitted)')
     parser_upload_manifest.add_argument('-e', '--extra-fields', dest='extra_fields', help='Comma separated list of extra CVE attributes to include if results are returned. Acceptable values are: "assigner", "description", "impact", "modified", "problem_types", "published", "references"', type=lambda fields: [f.strip() for f in fields.split(',')])
-    parser_upload_manifest.add_argument('-E', '--ecosystems', dest='ecosystems', help='Comma separated string of ecosystems that should be used for generating reports')
+    parser_upload_manifest.add_argument('-E', '--ecosystems', dest='ecosystems', help='Comma separated ecosystem names or "all" (to include all ecosystems); used for generating reports')
     parser_upload_manifest.add_argument('-S', '--subscribe', dest='subscribe', help='Manifest notification frequency.  Acceptable values are: "none", "daily", "weekly", "monthly".  Default is "none".')
     parser_upload_manifest.add_argument('--export-format', dest='export_format', help='File format for the exported report', choices=['pdf', 'pdfsummary', 'xlsx', 'csv', 'cyclonedx-vex', 'cyclonedx-sbom-vex', 'spdx_3-sbom-vex'])
     parser_upload_manifest.add_argument('--export-path', dest='export_path', help='File path where the exported report will be saved.')
