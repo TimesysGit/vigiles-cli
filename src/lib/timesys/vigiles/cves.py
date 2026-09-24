@@ -65,7 +65,44 @@ def search_cves_by_product(cpe_product, version="", ids_only=False):
 
 
 def set_status(scope, cve_id, package_name, status, justification=None, justification_detail=None, package_version=None, manifest_tokens=None, group_tokens=None):
+    """Update the vulnerability status of a CVE
 
+    Parameters
+    ----------
+    scope : str
+        Scope of the vulnerability update
+
+        "manifest", "group", "all"
+    cve_id : str
+        A valid vulnerability ID
+    package_name : str
+        Name of package for which status is to be set
+    status : str
+        Status to be set
+
+        "resolved", "resolved_with_pedigree", "exploitable", "in_triage", "false_positive", "not_affected"
+    justification : str, optional
+        Justification for the status to be set
+        Default: None
+
+        "code_not_present", "code_not_reachable", "requires_configuration", "requires_dependency", "requires_environment", "protected_by_compiler", "protected_at_runtime", "protected_at_perimeter", "protected_by_mitigating_control"
+    justification_detail : str, optional
+        Detailed justification for the status to be set
+        Default: None
+    package_version : str, optional
+        Version of package for which status is to be set
+        Default: "all"
+    manifest_tokens : list[str], optional
+        If the scope is "manifest", the list of manifest tokens to update
+        Default: None
+    group_tokens : list[str], optional
+        If the scope is "group", the list of group tokens to update
+
+    Returns
+    -------
+    dict
+        All updated manifest tokens
+    """
     if not cve_id:
         raise Exception("cve_id is required")
     if not package_name:
